@@ -57,10 +57,14 @@
     </div>
 </EditForm>
 
-<button @onclick="Export">Export</button>
+<div>
+    <button @onclick="Export">Export</button>
+</div>
 
-@*TODO: Implement Import*@
-@*<button @onclick="Import">Import</button>*@
+<div>
+    <InputFile OnChange="@ChooseFiles" multiple />
+    <button @onclick="Import">Import</button>
+</div>
 
 <br />
 
@@ -69,24 +73,24 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Title</th>
-            <th>Source</th>
-            <th>Memo</th>
-            <th>Tags</th>
-            <th>Reference</th>
-            <th>Created</th>
+            <th style="width: 10%;">Title</th>
+            <th style="width: 30%;">Source</th>
+            <th style="width: 30%;">Memo</th>
+            <th style="width: 10%;">Tags</th>
+            <th style="width: 10%;">Reference</th>
+            <th style="width: 10%;">Created</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var record in this._noteRecords)
         {
             <tr>
-                <td>@record.Title</td>
-                <td>@record.Source</td>
-                <td>@record.Memo</td>
-                <td>@record.Tags</td>
-                <td>@record.Reference</td>
-                <td>@record.Created</td>
+                <td style="width: 10%;">@record.Title</td>
+                <td style="width: 30%;">@record.Source</td>
+                <td style="width: 30%;">@record.Memo</td>
+                <td style="width: 10%;">@record.Tags</td>
+                <td style="width: 10%;">@record.Reference</td>
+                <td style="width: 10%;">@record.Created</td>
             </tr>
         }
     </tbody>
@@ -96,6 +100,8 @@
     private NoteFormModel _noteFormModel = new();
 
     private IEnumerable<NoteListModel> _noteRecords = new List<NoteListModel>();
+
+    private IEnumerable<IBrowserFile> _choosenFiles = new List<IBrowserFile>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -115,8 +121,23 @@
     private async Task Export()
         => await NoteService.Export(_noteRecords);
 
+    private void ChooseFiles(InputFileChangeEventArgs e)
+        => _choosenFiles = e.GetMultipleFiles();
+
+    private async Task Import()
+    {
+        foreach (var file in _choosenFiles)
+        {
+            var buffers = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffers);
+            await NoteService.Import(buffers);
+        }
+
+        await this.RefleshList();
+    }
+
     private async Task AddNote()
-        => await NoteService.Add(new NoteListModel(this._noteFormModel));
+        => await NoteService.Add(_noteFormModel);
 
     private void ClearForm()
         => this._noteFormModel = new();

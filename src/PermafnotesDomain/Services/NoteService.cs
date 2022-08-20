@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Graph;
+
+using CsvHelper;
 
 using PermafnotesDomain.Models;
 
@@ -26,8 +29,9 @@ namespace PermafnotesDomain.Services
             this._graphServiceClient = graphServiceClient;
         }
 
-        public async Task Add(NoteListModel noteListModel)
+        public async Task Add(NoteFormModel input)
         {
+            NoteListModel noteListModel = new(input);
             string uploadPath = $"{s_notesPathFromRoot}/{DateTime.Now.ToString(s_noteFileDateTimeFormat)}.json";
             JsonSerializerOptions options = new()
             {
@@ -49,8 +53,8 @@ namespace PermafnotesDomain.Services
 
             foreach (DriveItem child in children)
             {
-                MemoryStream ms = new();
-                Stream stream = await _graphServiceClient.Me.Drive.Root
+                using MemoryStream ms = new();
+                using Stream stream = await _graphServiceClient.Me.Drive.Root
                     .ItemWithPath($"{s_notesPathFromRoot}/{child.Name}").Content
                     .Request().GetAsync();
 
@@ -78,9 +82,21 @@ namespace PermafnotesDomain.Services
             await this.PutTextFile(uploadPath, sb.ToString());
         }
 
+        public async Task Import(byte[] inputBuffers)
+        {
+            using MemoryStream ms = new(inputBuffers);
+            using StreamReader sr = new(ms, s_encoding);
+            using CsvReader csv = new(sr, CultureInfo.InvariantCulture);
+
+            foreach (var record in csv.GetRecords<NoteFormModel>())
+            {
+                await this.Add(record);
+            }
+        }
+
         private async Task PutTextFile(string pathFromRoot, string text)
         {
-            var stream = new MemoryStream(
+            using var stream = new MemoryStream(
                 s_encoding.GetBytes(text)
             );
 
