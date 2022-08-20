@@ -2,7 +2,6 @@
 
 using System.ComponentModel.DataAnnotations;
 
-// TODO: 気持ち悪い。名前からModelを消したい
 public class NoteFormModel
 {
     [Required(ErrorMessage = "Title is required")]

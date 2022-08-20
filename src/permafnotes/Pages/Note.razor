@@ -43,16 +43,14 @@
         <tbody>
             <tr>
                 <td>
-                    <InputTextArea id="source" style="width: 100%;" @bind-Value="_noteFormModel.Source" ></InputTextArea>
+                    <InputTextArea id="source" style="width: 100%;" rows="5" @bind-Value="_noteFormModel.Source" ></InputTextArea>
                 </td>
                 <td>
-                    <InputTextArea id="memo" style="width: 100%;" @bind-Value="_noteFormModel.Memo" ></InputTextArea>
+                    <InputTextArea id="memo" style="width: 100%;" rows="5" @bind-Value="_noteFormModel.Memo" ></InputTextArea>
                 </td>
             </tr>
         </tbody>
     </table>
-
-    <br />
 
     <div>
         <button type="submit">Add</button>
