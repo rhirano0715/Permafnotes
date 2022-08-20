@@ -96,19 +96,24 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _noteRecords = await NoteService.FetchAll();
+        await this.RefleshList();
     }
 
     private async Task Add()
     {
-        NoteListModel noteListModel = new(this._noteFormModel);
-        await NoteService.Add(noteListModel);
-        
-        _noteRecords = await NoteService.FetchAll();
+        await this.AddNote();
 
         this.ClearForm();
+
+        await this.RefleshList();
     }
+
+    private async Task AddNote()
+        => await NoteService.Add(new NoteListModel(this._noteFormModel));
 
     private void ClearForm()
         => this._noteFormModel = new();
+
+    private async Task RefleshList()
+        => _noteRecords = await NoteService.FetchAll();
 }
