@@ -1,0 +1,114 @@
+﻿@page "/note"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Graph
+@using System.IO
+@using System.Text
+@using System.ComponentModel.DataAnnotations
+@using PermafnotesDomain.Models
+@using PermafnotesDomain.Services
+
+@attribute [Authorize]
+
+@inject NoteService NoteService
+
+<h3>Note</h3>
+
+<EditForm Model="@_noteFormModel" OnValidSubmit="@(async () => await Add())">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
+    <div>
+        <label>
+            Title:
+            <InputText id="title" @bind-Value="_noteFormModel.Title" ></InputText>
+        </label>
+        <label>
+            Tags
+            <InputText id="tags" @bind-Value="_noteFormModel.Tags" ></InputText>
+        </label>
+        <label>
+            Reference
+            <InputText id="reference" @bind-Value="_noteFormModel.Reference" ></InputText>
+        </label>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Source</th>
+                <th>Memo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <InputTextArea id="source" style="width: 100%;" @bind-Value="_noteFormModel.Source" ></InputTextArea>
+                </td>
+                <td>
+                    <InputTextArea id="memo" style="width: 100%;" @bind-Value="_noteFormModel.Memo" ></InputTextArea>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br />
+
+    <div>
+        <button type="submit">Add</button>
+    </div>
+</EditForm>
+
+<br />
+
+<h3>List</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Source</th>
+            <th>Memo</th>
+            <th>Tags</th>
+            <th>Reference</th>
+            <th>Created</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var record in this._noteRecords)
+        {
+            <tr>
+                <td>@record.Title</td>
+                <td>@record.Source</td>
+                <td>@record.Memo</td>
+                <td>@record.Tags</td>
+                <td>@record.Reference</td>
+                <td>@record.Created</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private NoteFormModel _noteFormModel = new();
+
+    private IEnumerable<NoteListModel> _noteRecords = new List<NoteListModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _noteRecords = await NoteService.FetchAll();
+    }
+
+    private async Task Add()
+    {
+        NoteListModel noteListModel = new(this._noteFormModel);
+        await NoteService.Add(noteListModel);
+        
+        _noteRecords = await NoteService.FetchAll();
+
+        this.ClearForm();
+    }
+
+    private void ClearForm()
+        => this._noteFormModel = new();
+}
