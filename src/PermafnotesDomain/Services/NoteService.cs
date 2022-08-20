@@ -37,13 +37,7 @@ namespace PermafnotesDomain.Services
 
             string uploadText = JsonSerializer.Serialize<NoteListModel>(noteListModel, options);
 
-            var stream = new MemoryStream(
-                s_encoding.GetBytes(uploadText)
-            );
-
-            var uploadedItem = await _graphServiceClient.Drive.Root
-                .ItemWithPath(uploadPath).Content.Request()
-                .PutAsync<DriveItem>(stream);
+            await this.PutTextFile(uploadPath, uploadText);
         }
 
         public async Task<IEnumerable<NoteListModel>> FetchAll()
