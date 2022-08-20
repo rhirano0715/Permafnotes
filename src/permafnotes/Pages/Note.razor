@@ -57,6 +57,11 @@
     </div>
 </EditForm>
 
+<button @onclick="Export">Export</button>
+
+@*TODO: Implement Import*@
+@*<button @onclick="Import">Import</button>*@
+
 <br />
 
 <h3>List</h3>
@@ -95,6 +100,7 @@
     protected override async Task OnInitializedAsync()
     {
         await this.RefleshList();
+        // TODO: If nothing else, create a few samples
     }
 
     private async Task Add()
@@ -105,6 +111,9 @@
 
         await this.RefleshList();
     }
+
+    private async Task Export()
+        => await NoteService.Export(_noteRecords);
 
     private async Task AddNote()
         => await NoteService.Add(new NoteListModel(this._noteFormModel));

@@ -14,7 +14,9 @@ namespace PermafnotesDomain.Services
     public class NoteService
     {
         private static string s_noteFileDateTimeFormat = "yyyyMMddHHmmssfffffff";
-        private static string s_notesPathFromRoot = @"Application/Permafnotes/notes";
+        private static string s_permafnotesBaseFolderPathFromRoot = @"Application/Permafnotes";
+        private static string s_notesPathFromRoot = $@"{s_permafnotesBaseFolderPathFromRoot}/notes";
+        private static string s_exportDestinationFolderPathFromRoot = $@"{s_permafnotesBaseFolderPathFromRoot}/exports";
         private static Encoding s_encoding = Encoding.GetEncoding("UTF-8");
 
         private GraphServiceClient _graphServiceClient;
@@ -66,6 +68,31 @@ namespace PermafnotesDomain.Services
             }
 
             return result;
+        }
+
+        public async Task Export(IEnumerable<NoteListModel> records)
+        {
+            string lineFormat = "\"{0}\"\t\"{1}\"\t\"{2}\"\t\"{3}\"\t\"{4}\"\t\"{5}\"\n";
+            StringBuilder sb = new(string.Format(lineFormat, "Title", "Source", "Memo", "Tags", "Reference", "Created"));
+            foreach (var record in records)
+            {
+                sb.Append(string.Format(lineFormat, record.Title, record.Source, record.Memo, record.Tags, record.Reference, record.Created));
+            }
+
+            string uploadPath = $"{s_exportDestinationFolderPathFromRoot}/{DateTime.Now.ToString(s_noteFileDateTimeFormat)}.tsv";
+
+            await this.PutTextFile(uploadPath, sb.ToString());
+        }
+
+        private async Task PutTextFile(string pathFromRoot, string text)
+        {
+            var stream = new MemoryStream(
+                s_encoding.GetBytes(text)
+            );
+
+            var uploadedItem = await _graphServiceClient.Drive.Root
+                .ItemWithPath(pathFromRoot).Content.Request()
+                .PutAsync<DriveItem>(stream);
         }
     }
 }
