@@ -14,9 +14,7 @@
 
 @inject NoteService NoteService
 
-<h3>Note</h3>
-
-<EditForm Model="@_noteFormModel" OnValidSubmit="@(async () => await Add())">
+s<EditForm Model="@_noteFormModel" OnValidSubmit="@(async () => await Add())">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
 
@@ -68,18 +66,15 @@
     <button @onclick="Import">Import</button>
 </div>
 
-<br />
-
-<h3>List</h3>
-
-<SfGrid @ref="GridNote" DataSource="@NoteRecords"  AllowFiltering="true" AllowSorting="true" Toolbar="@ToolbarItems" >
-     <GridColumns>
-         <GridColumn Field=@nameof(NoteListModel.Title) Width="120"></GridColumn>
-         <GridColumn Field=@nameof(NoteListModel.Source) Width="120"></GridColumn>
-         <GridColumn Field=@nameof(NoteListModel.Memo) Width="120"></GridColumn>
-         <GridColumn Field=@nameof(NoteListModel.Tags) Width="120"></GridColumn>
-         <GridColumn Field=@nameof(NoteListModel.Reference) Width="120"></GridColumn>
-         <GridColumn Field=@nameof(NoteListModel.Created) Format="d" Type="ColumnType.Date" TextAlign="TextAlign.Right" Width="130"></GridColumn>
+<SfGrid @ref="GridNote" DataSource="@NoteRecords" AllowMultiSorting="true" AllowFiltering="true" AllowTextWrap="true" AllowResizing="true" Toolbar="@ToolbarItems" GridLines="GridLine.Default" Height="400" FrozenRows="0" >
+    <GridTextWrapSettings WrapMode="WrapMode.Content"></GridTextWrapSettings>
+    <GridColumns>
+        <GridColumn Field=@nameof(NoteListModel.Title) Width="10%"></GridColumn>
+        <GridColumn Field=@nameof(NoteListModel.Source) Width="30%"></GridColumn>
+        <GridColumn Field=@nameof(NoteListModel.Memo) Width="30%"></GridColumn>
+        <GridColumn Field=@nameof(NoteListModel.Tags) Width="10%"></GridColumn>
+        <GridColumn Field=@nameof(NoteListModel.Reference) Width="10%"></GridColumn>
+        <GridColumn Field=@nameof(NoteListModel.Created) Type="ColumnType.DateTime" Format="yyyy/MM/dd hh:mm:ss.ffffff" TextAlign="TextAlign.Right" Width="10%"></GridColumn>
    </GridColumns>
 </SfGrid>
 
