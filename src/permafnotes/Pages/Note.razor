@@ -14,7 +14,7 @@
 
 @inject NoteService NoteService
 
-s<EditForm Model="@_noteFormModel" OnValidSubmit="@(async () => await Add())">
+<EditForm Model="@_noteFormModel" OnValidSubmit="@(async () => await Add())">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
 

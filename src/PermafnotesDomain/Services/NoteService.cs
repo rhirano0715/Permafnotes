@@ -21,6 +21,7 @@ namespace PermafnotesDomain.Services
         private static string s_permafnotesBaseFolderPathFromRoot = @"Application/Permafnotes";
         private static string s_notesPathFromRoot = $@"{s_permafnotesBaseFolderPathFromRoot}/notes";
         private static string s_exportDestinationFolderPathFromRoot = $@"{s_permafnotesBaseFolderPathFromRoot}/exports";
+        private static string s_cachePathFromRoot = $@"{s_permafnotesBaseFolderPathFromRoot}/cache.json";
         private static Encoding s_encoding = Encoding.GetEncoding("UTF-8");
 
         private GraphServiceClient _graphServiceClient;
@@ -49,13 +50,21 @@ namespace PermafnotesDomain.Services
 
         public async Task<IEnumerable<NoteListModel>> FetchAll()
         {
-            List<NoteListModel> result = new();
+            List<NoteListModel> result = await LoadCache();
+
             IDriveItemChildrenCollectionPage children = await _graphServiceClient.Me.Drive.Root
                 .ItemWithPath(s_notesPathFromRoot).Children
                 .Request().GetAsync();
 
             foreach (DriveItem child in children)
             {
+                _logger.LogInformation($"Fetch start {child.Name}");
+                if (result.Any(x => $"{x.Created.ToString(s_noteFileDateTimeFormat)}.json" == child.Name) )
+                {
+                    _logger.LogInformation($"{child.Name}'s cache is exists");
+                    continue;
+                }
+
                 _logger.LogInformation($"Fetching {child.Name}");
                 using MemoryStream ms = new();
                 using Stream stream = await _graphServiceClient.Me.Drive.Root
@@ -73,7 +82,9 @@ namespace PermafnotesDomain.Services
                 result.Add(model);
             }
 
-            return result;
+            await SaveCache(result);
+
+            return result.OrderByDescending(x => x.Created).ToList();
         }
 
         public async Task Export(IEnumerable<NoteListModel> records)
@@ -111,6 +122,40 @@ namespace PermafnotesDomain.Services
             var uploadedItem = await _graphServiceClient.Drive.Root
                 .ItemWithPath(pathFromRoot).Content.Request()
                 .PutAsync<DriveItem>(stream);
+        }
+
+        private async Task<List<NoteListModel>> LoadCache()
+        {
+            _logger.LogInformation($"Loading cache {s_cachePathFromRoot}");
+            using MemoryStream ms = new();
+            using Stream stream = await _graphServiceClient.Me.Drive.Root
+                .ItemWithPath(s_cachePathFromRoot).Content
+                .Request().GetAsync();
+
+            await stream.CopyToAsync(ms);
+
+            string text = s_encoding.GetString(ms.ToArray());
+            List<NoteListModel>? result= JsonSerializer.Deserialize<List<NoteListModel>>(text);
+            if (result is null)
+            {
+                return new List<NoteListModel>();
+            }
+
+            return result.OrderByDescending(x => x.Created).ToList();
+        }
+
+        private async Task SaveCache(IEnumerable<NoteListModel> noteListModels)
+        {
+            _logger.LogInformation($"Saving cache {s_cachePathFromRoot}");
+            JsonSerializerOptions options = new()
+            {
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.
+                Create(System.Text.Unicode.UnicodeRanges.All)
+            };
+
+            string uploadText = JsonSerializer.Serialize<IEnumerable<NoteListModel>>(noteListModels, options);
+
+            await this.PutTextFile(s_cachePathFromRoot, uploadText);
         }
     }
 }

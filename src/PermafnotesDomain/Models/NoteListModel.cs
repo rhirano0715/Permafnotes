@@ -12,7 +12,7 @@ public record NoteListModel
 
     public string Reference { get; init; }
 
-    public DateTime? Created { get; init; }
+    public DateTime Created { get; init; }
 
     public NoteListModel() { }
 
