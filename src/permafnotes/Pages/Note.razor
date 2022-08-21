@@ -7,6 +7,8 @@
 @using System.ComponentModel.DataAnnotations
 @using PermafnotesDomain.Models
 @using PermafnotesDomain.Services
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Data
 
 @attribute [Authorize]
 
@@ -70,42 +72,32 @@
 
 <h3>List</h3>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th style="width: 10%;">Title</th>
-            <th style="width: 30%;">Source</th>
-            <th style="width: 30%;">Memo</th>
-            <th style="width: 10%;">Tags</th>
-            <th style="width: 10%;">Reference</th>
-            <th style="width: 10%;">Created</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var record in this._noteRecords)
-        {
-            <tr>
-                <td style="width: 10%;">@record.Title</td>
-                <td style="width: 30%;">@record.Source</td>
-                <td style="width: 30%;">@record.Memo</td>
-                <td style="width: 10%;">@record.Tags</td>
-                <td style="width: 10%;">@record.Reference</td>
-                <td style="width: 10%;">@record.Created</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<SfGrid @ref="GridNote" DataSource="@NoteRecords"  AllowFiltering="true" AllowSorting="true" Toolbar="@ToolbarItems" >
+     <GridColumns>
+         <GridColumn Field=@nameof(NoteListModel.Title) Width="120"></GridColumn>
+         <GridColumn Field=@nameof(NoteListModel.Source) Width="120"></GridColumn>
+         <GridColumn Field=@nameof(NoteListModel.Memo) Width="120"></GridColumn>
+         <GridColumn Field=@nameof(NoteListModel.Tags) Width="120"></GridColumn>
+         <GridColumn Field=@nameof(NoteListModel.Reference) Width="120"></GridColumn>
+         <GridColumn Field=@nameof(NoteListModel.Created) Format="d" Type="ColumnType.Date" TextAlign="TextAlign.Right" Width="130"></GridColumn>
+   </GridColumns>
+</SfGrid>
 
 @code {
-    private NoteFormModel _noteFormModel = new();
+    [Inject]
+    private ILogger<Note> logger { get; set; }
+    public IEnumerable<NoteListModel> NoteRecords { get; set; } = new List<NoteListModel>();
+    public SfGrid<NoteListModel> GridNote;
 
-    private IEnumerable<NoteListModel> _noteRecords = new List<NoteListModel>();
+
+    private NoteFormModel _noteFormModel = new();
+    private List<string> ToolbarItems = new List<string>() { "Search" };
 
     private IEnumerable<IBrowserFile> _choosenFiles = new List<IBrowserFile>();
 
     protected override async Task OnInitializedAsync()
     {
-        await this.RefleshList();
+        await this.RefreshList();
         // TODO: If nothing else, create a few samples
     }
 
@@ -115,11 +107,11 @@
 
         this.ClearForm();
 
-        await this.RefleshList();
+        await this.RefreshList();
     }
 
     private async Task Export()
-        => await NoteService.Export(_noteRecords);
+        => await NoteService.Export(NoteRecords);
 
     private void ChooseFiles(InputFileChangeEventArgs e)
         => _choosenFiles = e.GetMultipleFiles();
@@ -133,7 +125,7 @@
             await NoteService.Import(buffers);
         }
 
-        await this.RefleshList();
+        await this.RefreshList();
     }
 
     private async Task AddNote()
@@ -142,6 +134,12 @@
     private void ClearForm()
         => this._noteFormModel = new();
 
-    private async Task RefleshList()
-        => _noteRecords = await NoteService.FetchAll();
+    private async Task RefreshList()
+    {
+        NoteRecords = await NoteService.FetchAll();
+        if (GridNote is null)
+            return;
+
+        await GridNote.Refresh();
+    }
 }

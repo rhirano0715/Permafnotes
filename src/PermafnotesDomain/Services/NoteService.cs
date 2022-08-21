@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Graph;
+using Microsoft.Extensions.Logging;
 
 using CsvHelper;
 
@@ -23,10 +24,12 @@ namespace PermafnotesDomain.Services
         private static Encoding s_encoding = Encoding.GetEncoding("UTF-8");
 
         private GraphServiceClient _graphServiceClient;
+        private ILogger<NoteService> _logger;
 
-        public NoteService(GraphServiceClient graphServiceClient)
+        public NoteService(GraphServiceClient graphServiceClient, ILogger<NoteService> logger)
         {
             this._graphServiceClient = graphServiceClient;
+            this._logger = logger;
         }
 
         public async Task Add(NoteFormModel input)
@@ -53,6 +56,7 @@ namespace PermafnotesDomain.Services
 
             foreach (DriveItem child in children)
             {
+                _logger.LogInformation($"Fetching {child.Name}");
                 using MemoryStream ms = new();
                 using Stream stream = await _graphServiceClient.Me.Drive.Root
                     .ItemWithPath($"{s_notesPathFromRoot}/{child.Name}").Content
@@ -61,7 +65,11 @@ namespace PermafnotesDomain.Services
                 await stream.CopyToAsync(ms);
 
                 string text = s_encoding.GetString(ms.ToArray());
-                NoteListModel model = JsonSerializer.Deserialize<NoteListModel>(text);
+                NoteListModel? model = JsonSerializer.Deserialize<NoteListModel>(text);
+                if (model is null)
+                {
+                    continue;
+                }
                 result.Add(model);
             }
 

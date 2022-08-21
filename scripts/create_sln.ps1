@@ -34,6 +34,18 @@ function main {
 
             dotnet add package Microsoft.Graph
             dotnet add package PublishSPAforGitHubPages.Build
+            dotnet add package Syncfusion.Blazor.Core
+            dotnet add package Syncfusion.Blazor.Buttons
+            dotnet add package Syncfusion.Blazor.Calendars
+            dotnet add package Syncfusion.Blazor.Data
+            dotnet add package Syncfusion.Blazor.DropDowns
+            dotnet add package Syncfusion.Blazor.Inputs
+            dotnet add package Syncfusion.Blazor.Navigations
+            dotnet add package Syncfusion.Blazor.Popups
+            dotnet add package Syncfusion.Blazor.Spinner
+            dotnet add package Syncfusion.ExcelExport.Net.Core
+            dotnet add package Syncfusion.PdfExport.Net.Core
+            dotnet add package Syncfusion.Blazor.Themes
 
         Pop-Location
 

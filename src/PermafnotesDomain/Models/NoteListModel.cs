@@ -1,8 +1,6 @@
 ﻿namespace PermafnotesDomain.Models;
 
-using System.ComponentModel.DataAnnotations;
-
-public record struct NoteListModel
+public record NoteListModel
 {
     public string Title { get; init; }
 
@@ -14,7 +12,9 @@ public record struct NoteListModel
 
     public string Reference { get; init; }
 
-    public DateTime Created { get; init; }
+    public DateTime? Created { get; init; }
+
+    public NoteListModel() { }
 
     public NoteListModel(NoteFormModel noteFormModel)
     {
