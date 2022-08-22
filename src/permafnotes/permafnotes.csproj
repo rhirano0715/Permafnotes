@@ -23,6 +23,7 @@
     <PackageReference Include="Syncfusion.Blazor.Popups" Version="20.2.0.44" />
     <PackageReference Include="Syncfusion.Blazor.RichTextEditor" Version="20.2.0.44" />
     <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.2.0.44" />
+    <PackageReference Include="Syncfusion.Blazor.SplitButtons" Version="20.2.0.44" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.2.0.44" />
     <ProjectReference Include="..\PermafnotesDomain\PermafnotesDomain.csproj" />
     <TrimmerRootAssembly Include="Microsoft.Authentication.WebAssembly.Msal" />

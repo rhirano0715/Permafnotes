@@ -13,6 +13,7 @@
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.RichTextEditor
 @using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.SplitButtons
 
 @attribute [Authorize]
 
@@ -44,17 +45,18 @@
         <label for="memo">Memo</label>
         <SfRichTextEditor  ID="memo" EditorMode="EditorMode.Markdown" @bind-Value="_noteFormModel.Memo" ></SfRichTextEditor>
     </div>
+
+    <div class="form-group">
+        <SfProgressButton Content="Add" CssClass="e-primary"></SfProgressButton>
+    </div>
 </EditForm>
 
-<div>
-    <InputFile OnChange="@ChooseFiles" multiple />
-</div>
+    <div>
+        <InputFile OnChange="@ChooseFiles" multiple />
+        <SfProgressButton Content="Import" CssClass="e-danger" @onclick="Import"></SfProgressButton>
+        <SfProgressButton Content="Export" CssClass="e-info" @onclick="Export"></SfProgressButton>
+    </div>
 
-<div>
-    <SfButton CssClass="e-primaryy" @onclick="@(async () => await Add())">Add</SfButton>
-    <SfButton CssClass="e-info" @onclick="Export">Export</SfButton>
-    <SfButton CssClass="e-danger" @onclick="Import">Import</SfButton>
-</div>
 
 <div style="position:relative; min-width: 1000px;">
     <SfGrid @ref="GridNote" DataSource="@NoteRecords" AllowSorting="true" AllowFiltering="true" AllowTextWrap="true" AllowResizing="true" Toolbar="@ToolbarItems" GridLines="GridLine.Default" Height="400" Width="100%" FrozenRows="0" >
@@ -73,13 +75,13 @@
 @code {
     [Inject]
     private ILogger<Note> logger { get; set; }
-    public IEnumerable<NoteListModel> NoteRecords { get; set; } = new List<NoteListModel>();
-    public SfGrid<NoteListModel> GridNote;
-
 
     private NoteFormModel _noteFormModel = new();
-    private List<string> ToolbarItems = new List<string>() { "Search" };
     private IEnumerable<NoteTagModel> Tags = new List<NoteTagModel>();
+
+    public SfGrid<NoteListModel> GridNote;
+    private List<string> ToolbarItems = new List<string>() { "Search" };
+    public IEnumerable<NoteListModel> NoteRecords { get; set; } = new List<NoteListModel>();
 
     private IEnumerable<IBrowserFile> _choosenFiles = new List<IBrowserFile>();
 
@@ -99,7 +101,9 @@
     }
 
     private async Task Export()
-        => await NoteService.Export(NoteRecords);
+    {
+        await NoteService.Export(NoteRecords);
+    }
 
     private void ChooseFiles(InputFileChangeEventArgs e)
         => _choosenFiles = e.GetMultipleFiles();
