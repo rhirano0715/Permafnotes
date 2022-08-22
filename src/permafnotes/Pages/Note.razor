@@ -44,19 +44,16 @@
         <label for="memo">Memo</label>
         <SfRichTextEditor  ID="memo" EditorMode="EditorMode.Markdown" @bind-Value="_noteFormModel.Memo" ></SfRichTextEditor>
     </div>
-
-    <div>
-        <SfButton>Add</SfButton>
-    </div>
 </EditForm>
 
 <div>
-    <SfButton @onclick="Export">Export</SfButton>
+    <InputFile OnChange="@ChooseFiles" multiple />
 </div>
 
 <div>
-    <InputFile OnChange="@ChooseFiles" multiple />
-    <SfButton @onclick="Import">Import</SfButton>
+    <SfButton CssClass="e-primaryy" @onclick="@(async () => await Add())">Add</SfButton>
+    <SfButton CssClass="e-info" @onclick="Export">Export</SfButton>
+    <SfButton CssClass="e-danger" @onclick="Import">Import</SfButton>
 </div>
 
 <div style="position:relative; min-width: 1000px;">
