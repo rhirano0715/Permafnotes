@@ -59,17 +59,19 @@
     <SfButton @onclick="Import">Import</SfButton>
 </div>
 
-<SfGrid @ref="GridNote" DataSource="@NoteRecords" AllowSorting="true" AllowFiltering="true" AllowTextWrap="true" AllowResizing="true" Toolbar="@ToolbarItems" GridLines="GridLine.Default" Height="400" FrozenRows="0" >
-    <GridTextWrapSettings WrapMode="WrapMode.Content"></GridTextWrapSettings>
-    <GridColumns>
-        <GridColumn Field=@nameof(NoteListModel.Title) Width="10%"></GridColumn>
-        <GridColumn Field=@nameof(NoteListModel.Source) Width="30%"></GridColumn>
-        <GridColumn Field=@nameof(NoteListModel.Memo) Width="30%"></GridColumn>
-        <GridColumn Field=@nameof(NoteListModel.Tags) Width="10%"></GridColumn>
-        <GridColumn Field=@nameof(NoteListModel.Reference) Width="10%"></GridColumn>
-        <GridColumn Field=@nameof(NoteListModel.Created) Type="ColumnType.DateTime" Format="yyyy/MM/dd hh:mm:ss.ffffff" TextAlign="TextAlign.Right" Width="10%"></GridColumn>
-   </GridColumns>
-</SfGrid>
+<div style="position:relative; min-width: 1000px;">
+    <SfGrid @ref="GridNote" DataSource="@NoteRecords" AllowSorting="true" AllowFiltering="true" AllowTextWrap="true" AllowResizing="true" Toolbar="@ToolbarItems" GridLines="GridLine.Default" Height="400" Width="100%" FrozenRows="0" >
+        <GridTextWrapSettings WrapMode="WrapMode.Content"></GridTextWrapSettings>
+        <GridColumns>
+            <GridColumn Field=@nameof(NoteListModel.Title) Width="10%"></GridColumn>
+            <GridColumn Field=@nameof(NoteListModel.Source) Width="30%"></GridColumn>
+            <GridColumn Field=@nameof(NoteListModel.Memo) Width="30%"></GridColumn>
+            <GridColumn Field=@nameof(NoteListModel.Tags) Width="10%"></GridColumn>
+            <GridColumn Field=@nameof(NoteListModel.Reference) Width="10%"></GridColumn>
+            <GridColumn Field=@nameof(NoteListModel.Created) Type="ColumnType.DateTime" Format="yyyy/MM/dd hh:mm:ss.ffffff" TextAlign="TextAlign.Right" Width="10%"></GridColumn>
+       </GridColumns>
+    </SfGrid>
+</div>
 
 @code {
     [Inject]
