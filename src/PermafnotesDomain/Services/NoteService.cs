@@ -21,7 +21,8 @@ namespace PermafnotesDomain.Services
         private static string s_permafnotesBaseFolderPathFromRoot = @"Application/Permafnotes";
         private static string s_notesPathFromRoot = $@"{s_permafnotesBaseFolderPathFromRoot}/notes";
         private static string s_exportDestinationFolderPathFromRoot = $@"{s_permafnotesBaseFolderPathFromRoot}/exports";
-        private static string s_cachePathFromRoot = $@"{s_permafnotesBaseFolderPathFromRoot}/cache.json";
+        private static string s_cacheName = "cache.json";
+        private static string s_cachePathFromRoot = $@"{s_permafnotesBaseFolderPathFromRoot}/{s_cacheName}";
         private static Encoding s_encoding = Encoding.GetEncoding("UTF-8");
 
         private GraphServiceClient _graphServiceClient;
@@ -143,6 +144,9 @@ namespace PermafnotesDomain.Services
         private async Task<List<NoteListModel>> LoadCache()
         {
             _logger.LogInformation($"Loading cache {s_cachePathFromRoot}");
+            if (! (await ExistsPath(s_permafnotesBaseFolderPathFromRoot, s_cacheName)))
+                return new List<NoteListModel>();
+
             using MemoryStream ms = new();
             using Stream stream = await _graphServiceClient.Me.Drive.Root
                 .ItemWithPath(s_cachePathFromRoot).Content
@@ -153,9 +157,7 @@ namespace PermafnotesDomain.Services
             string text = s_encoding.GetString(ms.ToArray());
             List<NoteListModel>? result= JsonSerializer.Deserialize<List<NoteListModel>>(text);
             if (result is null)
-            {
                 return new List<NoteListModel>();
-            }
 
             return result.OrderByDescending(x => x.Created).ToList();
         }
@@ -172,6 +174,14 @@ namespace PermafnotesDomain.Services
             string uploadText = JsonSerializer.Serialize<IEnumerable<NoteListModel>>(noteListModels, options);
 
             await this.PutTextFile(s_cachePathFromRoot, uploadText);
+        }
+
+        private async Task<bool> ExistsPath(string folderPath, string name)
+        {
+            IDriveItemChildrenCollectionPage children = await _graphServiceClient.Me.Drive.Root
+                .ItemWithPath(folderPath).Children
+                .Request().GetAsync();
+            return children.Any(x => x.Name == name);
         }
     }
 }
