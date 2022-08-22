@@ -46,6 +46,7 @@ function main {
             dotnet add package Syncfusion.ExcelExport.Net.Core
             dotnet add package Syncfusion.PdfExport.Net.Core
             dotnet add package Syncfusion.Blazor.Themes
+            dotnet add package Syncfusion.Blazor.RichTextEditor
 
         Pop-Location
 

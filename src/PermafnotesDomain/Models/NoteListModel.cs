@@ -1,4 +1,6 @@
-﻿namespace PermafnotesDomain.Models;
+﻿using System.Text.RegularExpressions;
+
+namespace PermafnotesDomain.Models;
 
 public record NoteListModel
 {
@@ -14,6 +16,8 @@ public record NoteListModel
 
     public DateTime Created { get; init; }
 
+    private Regex _regexTagDelimiter = new(@"(,|、)");
+
     public NoteListModel() { }
 
     public NoteListModel(NoteFormModel noteFormModel)
@@ -24,5 +28,10 @@ public record NoteListModel
         this.Tags = noteFormModel.Tags;
         this.Reference = noteFormModel.Reference;
         this.Created = DateTime.Now;
+    }
+
+    public IEnumerable<NoteTagModel> SplitTags()
+    {
+        return _regexTagDelimiter.Split(Tags).Select(x => new NoteTagModel(x.Trim()));
     }
 }

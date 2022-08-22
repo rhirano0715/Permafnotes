@@ -9,6 +9,9 @@
 @using PermafnotesDomain.Services
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.RichTextEditor
 
 @attribute [Authorize]
 
@@ -18,39 +21,28 @@
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
 
-    <div>
-        <label>
-            Title:
-            <InputText id="title" @bind-Value="_noteFormModel.Title" ></InputText>
-        </label>
-        <label>
-            Tags
-            <InputText id="tags" @bind-Value="_noteFormModel.Tags" ></InputText>
-        </label>
-        <label>
-            Reference
-            <InputText id="reference" @bind-Value="_noteFormModel.Reference" ></InputText>
-        </label>
+    <div class="form-group">
+        <label for="title">Title</label>
+        <SfTextBox ID="title" @bind-Value="_noteFormModel.Title" ></SfTextBox>
     </div>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Source</th>
-                <th>Memo</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <InputTextArea id="source" style="width: 100%;" rows="5" @bind-Value="_noteFormModel.Source" ></InputTextArea>
-                </td>
-                <td>
-                    <InputTextArea id="memo" style="width: 100%;" rows="5" @bind-Value="_noteFormModel.Memo" ></InputTextArea>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="form-group">
+        <label for="tags">Tags</label>
+        <SfMultiSelect @bind-Value="@_noteFormModel.Tags" DataSource="@Tags">
+             <MultiSelectFieldSettings Value="Name"></MultiSelectFieldSettings>
+        </SfMultiSelect>
+    </div>
+    <div class="form-group">
+        <label for="reference">Reference</label>
+        <SfTextBox ID="reference" @bind-Value="_noteFormModel.Reference" ></SfTextBox>
+    </div>
+    <div class="form-group">
+        <label for="source">Source</label>
+        <SfRichTextEditor  ID="source" EditorMode="EditorMode.Markdown" @bind-Value="_noteFormModel.Source" ></SfRichTextEditor>
+    </div>
+    <div class="form-group">
+        <label for="memo">Memo</label>
+        <SfRichTextEditor  ID="memo" EditorMode="EditorMode.Markdown" @bind-Value="_noteFormModel.Memo" ></SfRichTextEditor>
+    </div>
 
     <div>
         <button type="submit">Add</button>
@@ -87,6 +79,7 @@
 
     private NoteFormModel _noteFormModel = new();
     private List<string> ToolbarItems = new List<string>() { "Search" };
+    private IEnumerable<NoteTagModel> Tags = new List<NoteTagModel>();
 
     private IEnumerable<IBrowserFile> _choosenFiles = new List<IBrowserFile>();
 
@@ -132,6 +125,8 @@
     private async Task RefreshList()
     {
         NoteRecords = await NoteService.FetchAll();
+        Tags = NoteService.SelectAllTags(NoteRecords);
+
         if (GridNote is null)
             return;
 

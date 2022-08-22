@@ -113,6 +113,22 @@ namespace PermafnotesDomain.Services
             }
         }
 
+        public List<NoteTagModel> SelectAllTags(IEnumerable<NoteListModel> noteListModels)
+        {
+            List<NoteTagModel> result = new();
+            foreach(var m in noteListModels)
+            {
+                foreach (var t in m.SplitTags())
+                {
+                    if (result.Any(x => x.Name == t.Name))
+                        continue;
+                    result.Add(t);
+                }
+            }
+
+            return result;
+        }
+
         private async Task PutTextFile(string pathFromRoot, string text)
         {
             using var stream = new MemoryStream(
