@@ -12,6 +12,7 @@
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.RichTextEditor
+@using Syncfusion.Blazor.Buttons
 
 @attribute [Authorize]
 
@@ -45,17 +46,17 @@
     </div>
 
     <div>
-        <button type="submit">Add</button>
+        <SfButton>Add</SfButton>
     </div>
 </EditForm>
 
 <div>
-    <button @onclick="Export">Export</button>
+    <SfButton @onclick="Export">Export</SfButton>
 </div>
 
 <div>
     <InputFile OnChange="@ChooseFiles" multiple />
-    <button @onclick="Import">Import</button>
+    <SfButton @onclick="Import">Import</SfButton>
 </div>
 
 <SfGrid @ref="GridNote" DataSource="@NoteRecords" AllowSorting="true" AllowFiltering="true" AllowTextWrap="true" AllowResizing="true" Toolbar="@ToolbarItems" GridLines="GridLine.Default" Height="400" FrozenRows="0" >
