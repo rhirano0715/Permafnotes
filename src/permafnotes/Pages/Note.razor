@@ -58,7 +58,7 @@
     <button @onclick="Import">Import</button>
 </div>
 
-<SfGrid @ref="GridNote" DataSource="@NoteRecords" AllowMultiSorting="true" AllowFiltering="true" AllowTextWrap="true" AllowResizing="true" Toolbar="@ToolbarItems" GridLines="GridLine.Default" Height="400" FrozenRows="0" >
+<SfGrid @ref="GridNote" DataSource="@NoteRecords" AllowSorting="true" AllowFiltering="true" AllowTextWrap="true" AllowResizing="true" Toolbar="@ToolbarItems" GridLines="GridLine.Default" Height="400" FrozenRows="0" >
     <GridTextWrapSettings WrapMode="WrapMode.Content"></GridTextWrapSettings>
     <GridColumns>
         <GridColumn Field=@nameof(NoteListModel.Title) Width="10%"></GridColumn>
