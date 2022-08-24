@@ -1,5 +1,6 @@
 ﻿namespace PermafnotesDomain.Models;
 
+// TODO: move to permafnotes
 using System.ComponentModel.DataAnnotations;
 
 public class NoteFormModel
@@ -13,8 +14,16 @@ public class NoteFormModel
     [Required(ErrorMessage = "Memo is required")]
     public string Memo { get; set; } = string.Empty;
 
-    public string Tags { get; set; } = string.Empty;
+    public IEnumerable<string> Tags { get; set; } = new List<string>();
 
     [Required(ErrorMessage = "Reference is required")]
     public string Reference { get; set; } = string.Empty;
+
+    public override string ToString()
+        => $"{Title}, {Source}, {Memo}, {ConvertTagsToString()}, {Reference}";
+
+    internal string ConvertTagsToString()
+    {
+        return string.Join(',', Tags);
+    }
 }

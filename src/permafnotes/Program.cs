@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using permafnotes;
 using PermafnotesDomain.Services;
-using Syncfusion.Blazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -21,8 +20,8 @@ builder.Services.AddGraphClient("https://graph.microsoft.com/User.Read", "https:
 
 builder.Logging.SetMinimumLevel(LogLevel.Trace);
 
-builder.Services.AddScoped<NoteService>();
+builder.Services.AddAntDesign();
 
-builder.Services.AddSyncfusionBlazor(options => { options.IgnoreScriptIsolation = true; });
+builder.Services.AddScoped<NoteService>();
 
 await builder.Build().RunAsync();

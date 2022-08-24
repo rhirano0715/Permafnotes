@@ -1,22 +1,23 @@
-﻿using System.Text.RegularExpressions;
+﻿namespace PermafnotesDomain.Models;
 
-namespace PermafnotesDomain.Models;
+using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 public record NoteListModel
 {
-    public string Title { get; init; }
+    public string Title { get; set; }
 
-    public string Source { get; init; }
+    public string Source { get; set; }
 
-    public string Memo { get; init; }
+    public string Memo { get; set; }
 
-    public string Tags { get; init; }
+    public string Tags { get; set; }
 
-    public string Reference { get; init; }
+    public string Reference { get; set; }
 
-    public DateTime Created { get; init; }
+    public DateTime Created { get; set; }
 
-    private Regex _regexTagDelimiter = new(@"(,|、)");
+    private Regex _regexTagDelimiter = new(@",");
 
     public NoteListModel() { }
 
@@ -25,10 +26,13 @@ public record NoteListModel
         this.Title = noteFormModel.Title;
         this.Source = noteFormModel.Source;
         this.Memo = noteFormModel.Memo;
-        this.Tags = noteFormModel.Tags;
+        this.Tags = noteFormModel.ConvertTagsToString();
         this.Reference = noteFormModel.Reference;
         this.Created = DateTime.Now;
     }
+
+    public override string ToString()
+        => $"{Title}, {Source}, {Memo}, {Tags}, {Reference}, {Created}";
 
     public IEnumerable<NoteTagModel> SplitTags()
     {

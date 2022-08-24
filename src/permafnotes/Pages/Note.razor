@@ -4,82 +4,90 @@
 @using Microsoft.Graph
 @using System.IO
 @using System.Text
+@using System.ComponentModel
 @using System.ComponentModel.DataAnnotations
+
+@using AntDesign
+@using AntDesign.TableModels
+
 @using PermafnotesDomain.Models
 @using PermafnotesDomain.Services
-@using Syncfusion.Blazor.Grids
-@using Syncfusion.Blazor.Data
-@using Syncfusion.Blazor.Inputs
-@using Syncfusion.Blazor.DropDowns
-@using Syncfusion.Blazor.RichTextEditor
-@using Syncfusion.Blazor.Buttons
-@using Syncfusion.Blazor.SplitButtons
 
 @attribute [Authorize]
 
 @inject NoteService NoteService
 
-<EditForm Model="@_noteFormModel" OnValidSubmit="@(async () => await Add())">
-    <DataAnnotationsValidator></DataAnnotationsValidator>
-    <ValidationSummary></ValidationSummary>
+<Form Model="@_noteFormModel" OnFinish="OnFinish" OnFinishFailed="OnFinishFailed">
+    <FormItem Label="Title">
+        <Input @bind-Value="@context.Title" />
+    </FormItem>
+    <FormItem Label="Tags">
+        <Select Mode="tags"
+		        @bind-Values="@context.Tags"
+		        Placeholder="Please select"
+		        TItemValue="string"
+		        TItem="string"
+		        Size="@_sizeValue"
+		        OnSelectedItemsChanged="OnSelectedItemsChangedHandler">
+		        <SelectOptions>
+			        @foreach(var tag in Tags)
+			        {
+				        <SelectOption TItemValue="string" TItem="string" Value=@tag.Name Label=@tag.Name />
+			        }
+		        </SelectOptions>
+        </Select>
+    </FormItem>
+    <FormItem Label="Reference">
+        <Input @bind-Value="@context.Reference" />
+    </FormItem>
+    <FormItem Label="Source">
+        <TextArea @bind-Value="@context.Source" MinRows="@_minRows" />
+    </FormItem>
+    <FormItem Label="Memo">
+        <TextArea @bind-Value="@context.Memo" MinRows="@_minRows" />
+    </FormItem>
+    <FormItem>
+        <Button Type="@ButtonType.Primary" HtmlType="submit">Add</Button>
+    </FormItem>
+</Form>
 
-    <div class="form-group">
-        <label for="title">Title</label>
-        <SfTextBox ID="title" @bind-Value="_noteFormModel.Title" ></SfTextBox>
-    </div>
-    <div class="form-group">
-        <label for="tags">Tags</label>
-        <SfMultiSelect @bind-Value="@_noteFormModel.Tags" DataSource="@Tags">
-             <MultiSelectFieldSettings Value="Name"></MultiSelectFieldSettings>
-        </SfMultiSelect>
-    </div>
-    <div class="form-group">
-        <label for="reference">Reference</label>
-        <SfTextBox ID="reference" @bind-Value="_noteFormModel.Reference" ></SfTextBox>
-    </div>
-    <div class="form-group">
-        <label for="source">Source</label>
-        <SfRichTextEditor  ID="source" EditorMode="EditorMode.Markdown" @bind-Value="_noteFormModel.Source" ></SfRichTextEditor>
-    </div>
-    <div class="form-group">
-        <label for="memo">Memo</label>
-        <SfRichTextEditor  ID="memo" EditorMode="EditorMode.Markdown" @bind-Value="_noteFormModel.Memo" ></SfRichTextEditor>
-    </div>
 
-    <div class="form-group">
-        <SfProgressButton Content="Add" CssClass="e-primary"></SfProgressButton>
-    </div>
-</EditForm>
-
-    <div>
+<Space>
+    <SpaceItem>
         <InputFile OnChange="@ChooseFiles" multiple />
-        <SfProgressButton Content="Import" CssClass="e-danger" @onclick="Import"></SfProgressButton>
-        <SfProgressButton Content="Export" CssClass="e-info" @onclick="Export"></SfProgressButton>
-    </div>
+    </SpaceItem>
+    <SpaceItem>
+        <Button Type="@ButtonType.Primary" OnClick="Import" Danger >Import</Button>
+    </SpaceItem>
+    <SpaceItem>
+        <Button Type="@ButtonType.Primary" OnClick="Export" >Export</Button>
+    </SpaceItem>
+</Space>
 
-
-<div style="position:relative; min-width: 1000px;">
-    <SfGrid @ref="GridNote" DataSource="@NoteRecords" AllowSorting="true" AllowFiltering="true" AllowTextWrap="true" AllowResizing="true" Toolbar="@ToolbarItems" GridLines="GridLine.Default" Height="400" Width="100%" FrozenRows="0" >
-        <GridTextWrapSettings WrapMode="WrapMode.Content"></GridTextWrapSettings>
-        <GridColumns>
-            <GridColumn Field=@nameof(NoteListModel.Title) Width="10%"></GridColumn>
-            <GridColumn Field=@nameof(NoteListModel.Source) Width="30%"></GridColumn>
-            <GridColumn Field=@nameof(NoteListModel.Memo) Width="30%"></GridColumn>
-            <GridColumn Field=@nameof(NoteListModel.Tags) Width="10%"></GridColumn>
-            <GridColumn Field=@nameof(NoteListModel.Reference) Width="10%"></GridColumn>
-            <GridColumn Field=@nameof(NoteListModel.Created) Type="ColumnType.DateTime" Format="yyyy/MM/dd hh:mm:ss.ffffff" TextAlign="TextAlign.Right" Width="10%"></GridColumn>
-       </GridColumns>
-    </SfGrid>
-</div>
+<Table TItem="NoteListModel" DataSource="@NoteRecords">
+    <Column @bind-Field="context.Title"  TData="string" Sortable Filterable />
+    <Column @bind-Field="context.Source" TData="string" Sortable Filterable />
+    <Column @bind-Field="context.Memo"   TData="string" Sortable Filterable />
+    <Column Title="Tags"                 TData="string" Sortable Filterable >
+        @foreach (var tag in context.SplitTags())
+        {
+            <Tag Color="green">@(string.IsNullOrEmpty(tag.Name) ? string.Empty : tag.Name)</Tag>
+        }
+    </Column>
+    <Column @bind-Field="context.Reference" TData="string"   Sortable Filterable />
+    <Column @bind-Field="context.Created"   TData="DateTime" Sortable Filterable />
+</Table>
 
 @code {
     [Inject]
     private ILogger<Note> logger { get; set; }
 
+    private string _sizeValue = AntSizeLDSType.Default;
+    private uint _minRows = 4;
+
     private NoteFormModel _noteFormModel = new();
     private IEnumerable<NoteTagModel> Tags = new List<NoteTagModel>();
 
-    public SfGrid<NoteListModel> GridNote;
     private List<string> ToolbarItems = new List<string>() { "Search" };
     public IEnumerable<NoteListModel> NoteRecords { get; set; } = new List<NoteListModel>();
 
@@ -89,6 +97,8 @@
     {
         await this.RefreshList();
         // TODO: If nothing else, create a few samples
+
+        await base.OnInitializedAsync();
     }
 
     private async Task Add()
@@ -130,10 +140,31 @@
     {
         NoteRecords = await NoteService.FetchAll();
         Tags = NoteService.SelectAllTags(NoteRecords);
+    }
 
-        if (GridNote is null)
-            return;
+    private void OnRowClick(RowData<NoteListModel> row)
+    {
+        logger.LogDebug($"current row: ${row.Data.ToString()}");
+    }
+    private void OnSelectedItemChangedHandler(string value)
+    {
+        logger.LogDebug($"selected: ${value}");
+    }
 
-        await GridNote.Refresh();
+    private void OnSelectedItemsChangedHandler(IEnumerable<string> values)
+    {
+        if (values != null)
+            logger.LogDebug($"selected: ${string.Join(",", values)}");
+    }
+    private async Task OnFinish(EditContext editContext)
+    {
+        await Add();
+        logger.LogDebug($"Success:{_noteFormModel.ToString()}");
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        logger.LogError($"Failed:{_noteFormModel.ToString()}");
     }
 }
+
