@@ -134,7 +134,14 @@
         => await NoteService.Add(_noteFormModel);
 
     private void ClearForm()
-        => this._noteFormModel = new();
+        => this._noteFormModel = new()
+            {
+                Title = this._noteFormModel.Title,
+                Source = string.Empty,
+                Memo = string.Empty,
+                Tags = this._noteFormModel.Tags,
+                Reference = string.Empty
+            };
 
     private async Task RefreshList()
     {
