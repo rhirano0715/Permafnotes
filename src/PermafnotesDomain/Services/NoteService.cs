@@ -37,7 +37,7 @@ namespace PermafnotesDomain.Services
         public async Task Add(NoteFormModel input)
         {
             NoteListModel noteListModel = new(input);
-            string uploadPath = $"{s_notesPathFromRoot}/{DateTime.Now.ToString(s_noteFileDateTimeFormat)}.json";
+            string uploadPath = $"{s_notesPathFromRoot}/{noteListModel.Created.ToString(s_noteFileDateTimeFormat)}.json";
             JsonSerializerOptions options = new()
             {
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.
@@ -66,7 +66,7 @@ namespace PermafnotesDomain.Services
                     continue;
                 }
 
-                _logger.LogInformation($"Fetching {child.Name}");
+                _logger.LogWarning($"Fetching {child.Name}");
                 using MemoryStream ms = new();
                 using Stream stream = await _graphServiceClient.Me.Drive.Root
                     .ItemWithPath($"{s_notesPathFromRoot}/{child.Name}").Content
