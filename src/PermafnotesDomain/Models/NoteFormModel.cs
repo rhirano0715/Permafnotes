@@ -14,6 +14,7 @@ public class NoteFormModel
     [Required(ErrorMessage = "Memo is required")]
     public string Memo { get; set; } = string.Empty;
 
+    // TODO: implement delete duplicate item and empty item
     public IEnumerable<string> Tags { get; set; } = new List<string>();
 
     [Required(ErrorMessage = "Reference is required")]
@@ -24,6 +25,6 @@ public class NoteFormModel
 
     internal string ConvertTagsToString()
     {
-        return string.Join(',', Tags);
+        return string.Join(',', Tags.Where(x => !string.IsNullOrEmpty(x)));
     }
 }
