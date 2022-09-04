@@ -59,14 +59,14 @@ namespace PermafnotesDomain.Services
 
             foreach (DriveItem child in children)
             {
-                _logger.LogInformation($"Fetch start {child.Name}");
+                _logger.LogDebug($"Fetch start {child.Name}");
                 if (result.Any(x => $"{x.Created.ToString(s_noteFileDateTimeFormat)}.json" == child.Name) )
                 {
-                    _logger.LogInformation($"{child.Name}'s cache is exists");
+                    _logger.LogDebug($"{child.Name}'s cache is exists");
                     continue;
                 }
 
-                _logger.LogWarning($"Fetching {child.Name}");
+                _logger.LogWarning($"{child.Name} is not exists in cache. Loading this.");
                 using MemoryStream ms = new();
                 using Stream stream = await _graphServiceClient.Me.Drive.Root
                     .ItemWithPath($"{s_notesPathFromRoot}/{child.Name}").Content
@@ -143,7 +143,7 @@ namespace PermafnotesDomain.Services
 
         private async Task<List<NoteListModel>> LoadCache()
         {
-            _logger.LogInformation($"Loading cache {s_cachePathFromRoot}");
+            _logger.LogDebug($"Loading cache {s_cachePathFromRoot}");
             if (! (await ExistsPath(s_permafnotesBaseFolderPathFromRoot, s_cacheName)))
                 return new List<NoteListModel>();
 
@@ -164,7 +164,7 @@ namespace PermafnotesDomain.Services
 
         private async Task SaveCache(IEnumerable<NoteListModel> noteListModels)
         {
-            _logger.LogInformation($"Saving cache {s_cachePathFromRoot}");
+            _logger.LogDebug($"Saving cache {s_cachePathFromRoot}");
             JsonSerializerOptions options = new()
             {
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.
