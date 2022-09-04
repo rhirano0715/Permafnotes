@@ -18,7 +18,11 @@ builder.Services.AddMsalAuthentication(options =>
 
 builder.Services.AddGraphClient("https://graph.microsoft.com/User.Read", "https://graph.microsoft.com/Files.ReadWrite");
 
+#if DEBUG
 builder.Logging.SetMinimumLevel(LogLevel.Trace);
+#else
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+#endif
 
 builder.Services.AddAntDesign();
 
