@@ -53,7 +53,7 @@ namespace PermafnotesDomain.Services
 
             var result = noteRecords.ToList();
             result.Add(noteListModel);
-            return result;
+            return result.OrderByDescending(x => x.Created).ToList();
         }
 
         public async Task<IEnumerable<NoteListModel>> FetchAll(bool onlyCache = false)
