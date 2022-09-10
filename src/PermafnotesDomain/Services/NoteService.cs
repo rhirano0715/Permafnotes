@@ -34,7 +34,7 @@ namespace PermafnotesDomain.Services
             this._logger = logger;
         }
 
-        public async Task Add(NoteFormModel input)
+        public async Task<IEnumerable<NoteListModel>> Add(NoteFormModel input, IEnumerable<NoteListModel> noteRecords = null)
         {
             NoteListModel noteListModel = new(input);
             string uploadPath = $"{s_notesPathFromRoot}/{noteListModel.Created.ToString(s_noteFileDateTimeFormat)}.json";
@@ -47,6 +47,13 @@ namespace PermafnotesDomain.Services
             string uploadText = JsonSerializer.Serialize<NoteListModel>(noteListModel, options);
 
             await this.PutTextFile(uploadPath, uploadText);
+
+            if (noteRecords is null)
+                return new List<NoteListModel>() { noteListModel };
+
+            var result = noteRecords.ToList();
+            result.Add(noteListModel);
+            return result;
         }
 
         public async Task<IEnumerable<NoteListModel>> FetchAll(bool onlyCache = false)

@@ -98,7 +98,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await this.RefreshList(onlyCache:true);
+        await this.RefreshList();
         // TODO: If nothing else, create a few samples
 
         await base.OnInitializedAsync();
@@ -109,8 +109,6 @@
         await this.AddNote();
 
         this.ClearForm();
-
-        await this.RefreshList();
     }
 
     private async Task Export()
@@ -134,7 +132,7 @@
     }
 
     private async Task AddNote()
-        => await NoteService.Add(_noteFormModel);
+        => NoteRecords = await NoteService.Add(_noteFormModel, NoteRecords);
 
     private void ClearForm()
         => this._noteFormModel = new()
