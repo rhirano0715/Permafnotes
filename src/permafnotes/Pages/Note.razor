@@ -98,7 +98,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await this.RefreshList();
+        await this.RefreshList(onlyCache:true);
         // TODO: If nothing else, create a few samples
 
         await base.OnInitializedAsync();
@@ -146,9 +146,9 @@
                 Reference = string.Empty
             };
 
-    private async Task RefreshList()
+    private async Task RefreshList(bool onlyCache = false)
     {
-        NoteRecords = await NoteService.FetchAll();
+        NoteRecords = await NoteService.FetchAll(onlyCache);
         Tags = NoteService.SelectAllTags(NoteRecords);
     }
 

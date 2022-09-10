@@ -49,9 +49,11 @@ namespace PermafnotesDomain.Services
             await this.PutTextFile(uploadPath, uploadText);
         }
 
-        public async Task<IEnumerable<NoteListModel>> FetchAll()
+        public async Task<IEnumerable<NoteListModel>> FetchAll(bool onlyCache = false)
         {
             List<NoteListModel> result = await LoadCache();
+            if (onlyCache)
+                return result;
 
             IDriveItemChildrenCollectionPage children = await _graphServiceClient.Me.Drive.Root
                 .ItemWithPath(s_notesPathFromRoot).Children
