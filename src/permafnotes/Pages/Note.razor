@@ -108,6 +108,8 @@
     {
         await this.AddNote();
 
+        Tags = NoteService.SelectAllTags(NoteRecords);
+
         this.ClearForm();
     }
 
