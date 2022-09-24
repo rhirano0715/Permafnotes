@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using permafnotes;
 using PermafnotesDomain.Services;
+using PermafnotesRepositoryByMicrosoftGraph;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -26,6 +27,7 @@ builder.Logging.SetMinimumLevel(LogLevel.Information);
 
 builder.Services.AddAntDesign();
 
+builder.Services.AddScoped<IPermafnotesRepository, Repositoy>();
 builder.Services.AddScoped<NoteService>();
 
 await builder.Build().RunAsync();

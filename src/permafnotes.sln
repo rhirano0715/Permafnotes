@@ -5,7 +5,9 @@ VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "permafnotes", "permafnotes\permafnotes.csproj", "{981C4813-6D30-476D-9ADF-4AB0C9C5D1AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PermafnotesDomain", "PermafnotesDomain\PermafnotesDomain.csproj", "{89DA9AB4-E2E1-4B0A-AF46-B769EA4CB68B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PermafnotesDomain", "PermafnotesDomain\PermafnotesDomain.csproj", "{89DA9AB4-E2E1-4B0A-AF46-B769EA4CB68B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PermafnotesRepositoryByMicrosoftGraph", "PermafnotesRepositoryByMicrosoftGraph\PermafnotesRepositoryByMicrosoftGraph.csproj", "{B848B77E-97B2-4242-8395-014873EFF3D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{89DA9AB4-E2E1-4B0A-AF46-B769EA4CB68B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89DA9AB4-E2E1-4B0A-AF46-B769EA4CB68B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89DA9AB4-E2E1-4B0A-AF46-B769EA4CB68B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B848B77E-97B2-4242-8395-014873EFF3D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B848B77E-97B2-4242-8395-014873EFF3D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B848B77E-97B2-4242-8395-014873EFF3D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B848B77E-97B2-4242-8395-014873EFF3D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

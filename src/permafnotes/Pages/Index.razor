@@ -29,9 +29,10 @@ Welcome to your new app.
 
 @code
 {
-	List<string> _items;
-	string _selectedValue;
-    IEnumerable<string> _selectedValues1, _selectedValues2;
+	List<string> _items = new();
+	string _selectedValue = string.Empty;
+    IEnumerable<string> _selectedValues1 = new List<string>();
+    IEnumerable<string> _selectedValues2 = new List<string>();
     private string _sizeValue = AntSizeLDSType.Default;
 
 	protected override void OnInitialized()

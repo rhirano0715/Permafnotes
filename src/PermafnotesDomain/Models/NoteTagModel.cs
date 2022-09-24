@@ -4,7 +4,7 @@ namespace PermafnotesDomain.Models;
 
 public record NoteTagModel
 {
-    public string Name { get; init; }
+    public string Name { get; init; } = string.Empty;
 
     public NoteTagModel() { }
 

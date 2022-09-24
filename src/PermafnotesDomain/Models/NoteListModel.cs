@@ -5,17 +5,17 @@ using System.Text.RegularExpressions;
 
 public record NoteListModel
 {
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
 
-    public string Source { get; set; }
+    public string Source { get; set; } = string.Empty;
 
-    public string Memo { get; set; }
+    public string Memo { get; set; } = string.Empty;
 
-    public string Tags { get; set; }
+    public string Tags { get; set; } = string.Empty;
 
-    public string Reference { get; set; }
+    public string Reference { get; set; } = string.Empty;
 
-    public DateTime Created { get; set; }
+    public DateTime Created { get; set; } = DateTime.MinValue;
 
     private Regex _regexTagDelimiter = new(@",");
 
