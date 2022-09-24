@@ -106,17 +106,15 @@
 
     private async Task Add()
     {
-        await this.AddNote();
+        NoteRecords = await NoteService.Add(_noteFormModel);
 
-        Tags = NoteService.SelectAllTags(NoteRecords);
+        Tags = NoteService.SelectAllTags();
 
         this.ClearForm();
     }
 
     private async Task Export()
-    {
-        await NoteService.Export(NoteRecords);
-    }
+        => await NoteService.Export(NoteRecords);
 
     private void ChooseFiles(InputFileChangeEventArgs e)
         => _choosenFiles = e.GetMultipleFiles();
@@ -133,9 +131,6 @@
         await this.RefreshList();
     }
 
-    private async Task AddNote()
-        => NoteRecords = await NoteService.Add(_noteFormModel, NoteRecords);
-
     private void ClearForm()
         => this._noteFormModel = new()
             {
@@ -149,13 +144,14 @@
     private async Task RefreshList(bool onlyCache = false)
     {
         NoteRecords = await NoteService.FetchAll(onlyCache);
-        Tags = NoteService.SelectAllTags(NoteRecords);
+        Tags = NoteService.SelectAllTags();
     }
 
     private void OnRowClick(RowData<NoteListModel> row)
     {
         logger.LogDebug($"current row: ${row.Data.ToString()}");
     }
+
     private void OnSelectedItemChangedHandler(string value)
     {
         logger.LogDebug($"selected: ${value}");
@@ -166,6 +162,7 @@
         if (values != null)
             logger.LogDebug($"selected: ${string.Join(",", values)}");
     }
+
     private async Task OnFinish(EditContext editContext)
     {
         await Add();

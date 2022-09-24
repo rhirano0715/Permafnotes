@@ -17,29 +17,19 @@ namespace PermafnotesDomain.Services
             this._logger = logger;
         }
 
-        public async Task<IEnumerable<NoteListModel>> Add(NoteFormModel input, IEnumerable<NoteListModel>? noteRecords = null)
-        {
-            return await this._repository.Add(input, noteRecords);
-        }
+        public async Task<IEnumerable<NoteListModel>> Add(NoteFormModel input)
+            => await this._repository.Add(input);
 
         public async Task<IEnumerable<NoteListModel>> FetchAll(bool onlyCache = false)
-        {
-            return await this._repository.FetchAll(onlyCache);
-        }
+            => await this._repository.FetchAll(onlyCache);
 
         public async Task Export(IEnumerable<NoteListModel> records)
-        {
-            await this._repository.Export(records);
-        }
+            => await this._repository.Export(records);
 
         public async Task Import(byte[] inputBuffers)
-        {
-            await this._repository.Import(inputBuffers);
-        }
+            => await this._repository.Import(inputBuffers);
 
-        public IEnumerable<NoteTagModel> SelectAllTags(IEnumerable<NoteListModel> noteListModels)
-        {
-            return this._repository.SelectAllTags(noteListModels);
-        }
+        public IEnumerable<NoteTagModel> SelectAllTags()
+            => this._repository.SelectAllTags();
     }
 }
