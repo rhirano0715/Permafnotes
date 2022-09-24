@@ -33,10 +33,9 @@ namespace PermafnotesRepositoryByMicrosoftGraph
             this._notesPathFromRoot = $@"{_permafnotesBaseFolderPathFromRoot}/notes";
             this._exportDestinationFolderPathFromRoot = $@"{_permafnotesBaseFolderPathFromRoot}/exports";
             this._cachePathFromRoot = $@"{_permafnotesBaseFolderPathFromRoot}/{s_cacheName}";
+        }
 
-    }
-
-    public async Task<IEnumerable<NoteListModel>> Add(NoteFormModel input, IEnumerable<NoteListModel>? noteRecords = null)
+        public async Task<IEnumerable<NoteListModel>> Add(NoteFormModel input, IEnumerable<NoteListModel>? noteRecords = null)
         {
             NoteListModel noteListModel = new(input);
             string uploadPath = $"{_notesPathFromRoot}/{noteListModel.Created.ToString(s_noteFileDateTimeFormat)}.json";
@@ -125,7 +124,7 @@ namespace PermafnotesRepositoryByMicrosoftGraph
             }
         }
 
-        public List<NoteTagModel> SelectAllTags(IEnumerable<NoteListModel> noteListModels)
+        public IEnumerable<NoteTagModel> SelectAllTags(IEnumerable<NoteListModel> noteListModels)
         {
             List<NoteTagModel> result = new();
             foreach (var m in noteListModels)

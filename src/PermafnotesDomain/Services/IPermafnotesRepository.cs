@@ -8,6 +8,6 @@ namespace PermafnotesDomain.Services
         Task Export(IEnumerable<NoteListModel> records);
         Task<IEnumerable<NoteListModel>> FetchAll(bool onlyCache = false);
         Task Import(byte[] inputBuffers);
-        List<NoteTagModel> SelectAllTags(IEnumerable<NoteListModel> noteListModels);
+        IEnumerable<NoteTagModel> SelectAllTags(IEnumerable<NoteListModel> noteListModels);
     }
 }

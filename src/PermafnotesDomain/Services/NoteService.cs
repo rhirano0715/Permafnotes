@@ -37,7 +37,7 @@ namespace PermafnotesDomain.Services
             await this._repository.Import(inputBuffers);
         }
 
-        public List<NoteTagModel> SelectAllTags(IEnumerable<NoteListModel> noteListModels)
+        public IEnumerable<NoteTagModel> SelectAllTags(IEnumerable<NoteListModel> noteListModels)
         {
             return this._repository.SelectAllTags(noteListModels);
         }
