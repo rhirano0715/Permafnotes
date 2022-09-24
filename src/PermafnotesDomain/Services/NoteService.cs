@@ -6,7 +6,7 @@ using PermafnotesDomain.Models;
 
 namespace PermafnotesDomain.Services
 {
-    public class NoteService : IPermafnotesRepository
+    public class NoteService
     {
         private IPermafnotesRepository _repository;
         private ILogger<NoteService> _logger;

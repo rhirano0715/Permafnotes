@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Microsoft.Graph;
 using Microsoft.Extensions.Logging;
 
@@ -19,26 +14,32 @@ namespace PermafnotesRepositoryByMicrosoftGraph
     public class Repositoy : IPermafnotesRepository
     {
         private static string s_noteFileDateTimeFormat = "yyyyMMddHHmmssfffffff";
-        private static string s_permafnotesBaseFolderPathFromRoot = @"Application/Permafnotes";
-        private static string s_notesPathFromRoot = $@"{s_permafnotesBaseFolderPathFromRoot}/notes";
-        private static string s_exportDestinationFolderPathFromRoot = $@"{s_permafnotesBaseFolderPathFromRoot}/exports";
         private static string s_cacheName = "cache.json";
-        private static string s_cachePathFromRoot = $@"{s_permafnotesBaseFolderPathFromRoot}/{s_cacheName}";
         private static Encoding s_encoding = Encoding.GetEncoding("UTF-8");
 
         private GraphServiceClient _graphServiceClient;
         private ILogger<NoteService> _logger;
 
-        public Repositoy(GraphServiceClient graphServiceClient, ILogger<NoteService> logger)
+        private string _permafnotesBaseFolderPathFromRoot = string.Empty;
+        private string _notesPathFromRoot = string.Empty;
+        private string _exportDestinationFolderPathFromRoot = string.Empty;
+        private string _cachePathFromRoot = string.Empty;
+
+        public Repositoy(GraphServiceClient graphServiceClient, ILogger<NoteService> logger, string permafnotesBaseFolderPathFromRoot= @"Application/Permafnotes")
         {
             this._graphServiceClient = graphServiceClient;
             this._logger = logger;
-        }
+            this._permafnotesBaseFolderPathFromRoot = permafnotesBaseFolderPathFromRoot;
+            this._notesPathFromRoot = $@"{_permafnotesBaseFolderPathFromRoot}/notes";
+            this._exportDestinationFolderPathFromRoot = $@"{_permafnotesBaseFolderPathFromRoot}/exports";
+            this._cachePathFromRoot = $@"{_permafnotesBaseFolderPathFromRoot}/{s_cacheName}";
 
-        public async Task<IEnumerable<NoteListModel>> Add(NoteFormModel input, IEnumerable<NoteListModel>? noteRecords = null)
+    }
+
+    public async Task<IEnumerable<NoteListModel>> Add(NoteFormModel input, IEnumerable<NoteListModel>? noteRecords = null)
         {
             NoteListModel noteListModel = new(input);
-            string uploadPath = $"{s_notesPathFromRoot}/{noteListModel.Created.ToString(s_noteFileDateTimeFormat)}.json";
+            string uploadPath = $"{_notesPathFromRoot}/{noteListModel.Created.ToString(s_noteFileDateTimeFormat)}.json";
             JsonSerializerOptions options = new()
             {
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.
@@ -64,7 +65,7 @@ namespace PermafnotesRepositoryByMicrosoftGraph
                 return result;
 
             IDriveItemChildrenCollectionPage children = await _graphServiceClient.Me.Drive.Root
-                .ItemWithPath(s_notesPathFromRoot).Children
+                .ItemWithPath(_notesPathFromRoot).Children
                 .Request().GetAsync();
 
             foreach (DriveItem child in children)
@@ -79,7 +80,7 @@ namespace PermafnotesRepositoryByMicrosoftGraph
                 _logger.LogWarning($"{child.Name} is not exists in cache. Loading this.");
                 using MemoryStream ms = new();
                 using Stream stream = await _graphServiceClient.Me.Drive.Root
-                    .ItemWithPath($"{s_notesPathFromRoot}/{child.Name}").Content
+                    .ItemWithPath($"{_notesPathFromRoot}/{child.Name}").Content
                     .Request().GetAsync();
 
                 await stream.CopyToAsync(ms);
@@ -107,7 +108,7 @@ namespace PermafnotesRepositoryByMicrosoftGraph
                 sb.Append(string.Format(lineFormat, record.Title, record.Source, record.Memo, record.Tags, record.Reference, record.Created));
             }
 
-            string uploadPath = $"{s_exportDestinationFolderPathFromRoot}/{DateTime.Now.ToString(s_noteFileDateTimeFormat)}.tsv";
+            string uploadPath = $"{_exportDestinationFolderPathFromRoot}/{DateTime.Now.ToString(s_noteFileDateTimeFormat)}.tsv";
 
             await this.PutTextFile(uploadPath, sb.ToString());
         }
@@ -153,13 +154,13 @@ namespace PermafnotesRepositoryByMicrosoftGraph
 
         private async Task<List<NoteListModel>> LoadCache()
         {
-            _logger.LogDebug($"Loading cache {s_cachePathFromRoot}");
-            if (!(await ExistsPath(s_permafnotesBaseFolderPathFromRoot, s_cacheName)))
+            _logger.LogDebug($"Loading cache {_cachePathFromRoot}");
+            if (!(await ExistsPath(_permafnotesBaseFolderPathFromRoot, s_cacheName)))
                 return new List<NoteListModel>();
 
             using MemoryStream ms = new();
             using Stream stream = await _graphServiceClient.Me.Drive.Root
-                .ItemWithPath(s_cachePathFromRoot).Content
+                .ItemWithPath(_cachePathFromRoot).Content
                 .Request().GetAsync();
 
             await stream.CopyToAsync(ms);
@@ -174,7 +175,7 @@ namespace PermafnotesRepositoryByMicrosoftGraph
 
         private async Task SaveCache(IEnumerable<NoteListModel> noteListModels)
         {
-            _logger.LogDebug($"Saving cache {s_cachePathFromRoot}");
+            _logger.LogDebug($"Saving cache {_cachePathFromRoot}");
             JsonSerializerOptions options = new()
             {
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.
@@ -183,7 +184,7 @@ namespace PermafnotesRepositoryByMicrosoftGraph
 
             string uploadText = JsonSerializer.Serialize<IEnumerable<NoteListModel>>(noteListModels, options);
 
-            await this.PutTextFile(s_cachePathFromRoot, uploadText);
+            await this.PutTextFile(_cachePathFromRoot, uploadText);
         }
 
         private async Task<bool> ExistsPath(string folderPath, string name)
