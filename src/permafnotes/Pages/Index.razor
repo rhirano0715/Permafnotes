@@ -1,70 +1,81 @@
 ﻿@page "/"
 
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Graph
+@using System.IO
+@using System.Text
+@using System.ComponentModel
+@using System.ComponentModel.DataAnnotations
+
+@using AntDesign
+@using AntDesign.TableModels
+
+@using PermafnotesDomain.Models
+@using PermafnotesDomain.Services
+
+@attribute [Authorize]
+
+@inject NoteService NoteService
+
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<h2>Titles</h2>
 
-Welcome to your new app.
+<Table TItem="RankingRecord" DataSource="@Titles">
+    <Column @bind-Field="context.Name" TData="string" Sortable Filterable />
+    <Column @bind-Field="context.Count" TData="int" Sortable Filterable />
+</Table>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
 
-<Button Type="primary">Ant Design Button</Button>
-
-@*input tag sample*@
-<Select Mode="tags"
-		@bind-Values="@_selectedValues2"
-		Placeholder="Please select"
-		TItemValue="string"
-		TItem="string"
-		Size="@_sizeValue"
-		OnSelectedItemsChanged="OnSelectedItemsChangedHandler">
-		<SelectOptions>
-			@foreach(var item in _items)
-			{
-				<SelectOption TItemValue="string" TItem="string" Value=@item Label=@item />
-			}
-		</SelectOptions>
-</Select>
+<h2>Tags</h2>
+<Table TItem="RankingRecord" DataSource="@Tags">
+    <Column @bind-Field="context.Name" TData="string" Sortable Filterable />
+    <Column @bind-Field="context.Count" TData="int" Sortable Filterable />
+</Table>
 
 
 @code
 {
-	List<string> _items = new();
-	string _selectedValue = string.Empty;
-    IEnumerable<string> _selectedValues1 = new List<string>();
-    IEnumerable<string> _selectedValues2 = new List<string>();
-    private string _sizeValue = AntSizeLDSType.Default;
-
-	protected override void OnInitialized()
+    public record RankingRecord
     {
-        const int min = 10;
-        const int max = 36;
-        _items = new List<string>();
+        public string Name { get; set; } = string.Empty;
+        public int Count { get; set; } = 0;
 
-        for (var i = min; max > i; i++)
+        public RankingRecord(string name, int count)
         {
-            var value = Convert.ToString(i, 16).PadLeft(2, '0') + i.ToString();
-            _items.Add(value);
+            Name = name;
+            Count = count;
         }
-		_selectedValue = "0a10";
-		_selectedValues1 = new List<string> { "0a10" , "0c12"};
-		_selectedValues2 = new List<string> { "0a10" , "0c12"};
     }
 
-    private void OnChangeSize(string value)
-    {
-        _sizeValue = value;
-        Console.WriteLine($"selected size: ${value}");
-    }
+    [Inject]
+    private ILogger<Note> logger { get; set; }
 
-	private void OnSelectedItemChangedHandler(string value)
-    {
-		Console.WriteLine($"selected: ${value}");
-    }
+    public IEnumerable<RankingRecord> Titles { get; set; } = new List<RankingRecord>();
+    public IEnumerable<RankingRecord> Tags { get; set; } = new List<RankingRecord>();
 
-    private void OnSelectedItemsChangedHandler(IEnumerable<string> values)
+    protected override async Task OnInitializedAsync()
     {
-		if (values != null)
-			Console.WriteLine($"selected: ${string.Join(",", values)}");
+        var noteRecords = await NoteService.FetchAll();
+
+        Titles = noteRecords.GroupBy(x => x.Title)
+                    .Select(x => new RankingRecord(x.Key, x.Count()))
+                    .OrderByDescending(x => x.Count)
+                    .ToList()
+                    ;
+
+        var tags = new List<NoteTagModel>();
+        foreach (var r in noteRecords)
+        {
+            foreach(var t in r.SplitTags())
+            {
+                tags.Add(t);
+            }
+        }
+        Tags = tags.GroupBy(x => x.Name)
+                    .Select(x => new RankingRecord(x.Key, x.Count()))
+                    .OrderByDescending(x => x.Count)
+                    .ToList()
+                    ;
     }
 }
