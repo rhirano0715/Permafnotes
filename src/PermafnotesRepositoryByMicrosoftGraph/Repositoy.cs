@@ -9,7 +9,7 @@ using CsvHelper;
 using PermafnotesDomain.Models;
 using PermafnotesDomain.Services;
 
-namespace PermafnotesRepositoryByMicrosoftGraph
+namespace PermafnotesRepositoryByFile
 {
     public class Repositoy : IPermafnotesRepository
     {
