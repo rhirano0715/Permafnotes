@@ -15,7 +15,7 @@
     <PackageReference Include="Microsoft.Graph" Version="4.36.0" />
     <PackageReference Include="PublishSPAforGitHubPages.Build" Version="2.0.1" />
     <ProjectReference Include="..\PermafnotesDomain\PermafnotesDomain.csproj" />
-    <ProjectReference Include="..\PermafnotesRepositoryByMicrosoftGraph\PermafnotesRepositoryByFile.csproj" />
+    <ProjectReference Include="..\PermafnotesRepositoryByFile\PermafnotesRepositoryByFile.csproj" />
     <TrimmerRootAssembly Include="Microsoft.Authentication.WebAssembly.Msal" />
   </ItemGroup>
 
