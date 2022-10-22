@@ -33,7 +33,7 @@ builder.Services.AddScoped<IPermafnotesRepository, Repositoy>(provider =>
 {
     var client = provider.GetRequiredService<GraphServiceClient>();
     var logger = provider.GetRequiredService<ILogger<NoteService>>();
-    return Repositoy.CreateRepository(client, logger);
+    return Repositoy.CreateRepositoryUsingMsGraph(client, logger);
 });
 
 await builder.Build().RunAsync();

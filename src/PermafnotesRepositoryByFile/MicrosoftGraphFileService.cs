@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace PermafnotesRepositoryByFile
 {
     internal record PermafnotesNoteFile(string Name);
-    internal class MicrosoftGraphFile : IFileService
+    internal class MicrosoftGraphFileService : IFileService
     {
         private static Encoding s_encoding = Encoding.GetEncoding("UTF-8");
         private static string s_cacheName = "cache.json";
@@ -51,7 +51,7 @@ namespace PermafnotesRepositoryByFile
         }
 
 
-        internal MicrosoftGraphFile(GraphServiceClient graphServiceClient, ILogger<NoteService> logger, string baseDirectoryPathFromRoot = @"")
+        internal MicrosoftGraphFileService(GraphServiceClient graphServiceClient, ILogger<NoteService> logger, string baseDirectoryPathFromRoot = @"")
         {
             this._graphServiceClient = graphServiceClient;
             this._logger = logger;

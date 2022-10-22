@@ -21,9 +21,9 @@ namespace PermafnotesRepositoryByFile
 
         private IEnumerable<NoteListModel> _noteRecords = new List<NoteListModel>();
 
-        public static Repositoy CreateRepository(GraphServiceClient graphServiceClient, ILogger<NoteService> logger)
+        public static Repositoy CreateRepositoryUsingMsGraph(GraphServiceClient graphServiceClient, ILogger<NoteService> logger)
         {
-            return new Repositoy(new MicrosoftGraphFile(graphServiceClient, logger), logger);
+            return new Repositoy(new MicrosoftGraphFileService(graphServiceClient, logger), logger);
         }
 
         internal Repositoy(IFileService fileService, ILogger<NoteService> logger)

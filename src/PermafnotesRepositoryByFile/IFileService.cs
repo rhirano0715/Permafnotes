@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PermafnotesRepositoryByFile
 {
-    internal interface IFileService
+    interface IFileService
     {
         internal Task<IEnumerable<PermafnotesNoteFile>> FetchChildren();
         internal Task<string> ReadNote(string name);
