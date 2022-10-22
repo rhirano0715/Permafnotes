@@ -26,6 +26,14 @@ namespace PermafnotesRepositoryByFile
                 return $@"{this._baseDirectoryPathFromRoot}/notes";
             }
         }
+        private string CacheDirectoryFromRoot
+        {
+            get
+            {
+                return this._baseDirectoryPathFromRoot;
+            }
+        }
+
         private string CachePathFromRoot
         {
             get
@@ -68,7 +76,7 @@ namespace PermafnotesRepositoryByFile
         }
         internal async Task<string> ReadCache()
         {
-            if (!(await ExistsPath(this.CachePathFromRoot, s_cacheName)))
+            if (!(await ExistsPath(this.CacheDirectoryFromRoot, s_cacheName)))
                 return string.Empty;
 
             return await this.ReadFile(this.CachePathFromRoot);
@@ -88,7 +96,7 @@ namespace PermafnotesRepositoryByFile
 
         internal async Task WriteNote(string fileName, string text)
         {
-            await this.WriteFile($@"{this.ExportDestinationPathFromRoot}/{fileName}", text);
+            await this.WriteFile($@"{this.NotePathFromRoot}/{fileName}", text);
         }
 
         internal async Task WriteCache(string text)
@@ -112,7 +120,7 @@ namespace PermafnotesRepositoryByFile
                 .PutAsync<DriveItem>(stream);
         }
 
-        internal async Task<bool> ExistsPath(string folderPath, string name)
+        private async Task<bool> ExistsPath(string folderPath, string name)
         {
             IDriveItemChildrenCollectionPage children = await _graphServiceClient.Me.Drive.Root
                 .ItemWithPath(folderPath).Children
