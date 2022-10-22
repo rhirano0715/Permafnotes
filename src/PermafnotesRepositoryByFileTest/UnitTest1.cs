@@ -1,9 +1,5 @@
 namespace PermafnotesRepositoryByFile
 {
-    internal class FileService : IFileService
-    {
-
-    }
     public class Tests
     {
         [SetUp]
