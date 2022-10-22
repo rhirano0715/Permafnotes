@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using permafnotes;
 using PermafnotesDomain.Services;
 using PermafnotesRepositoryByFile;
+using Microsoft.Graph;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -27,8 +28,12 @@ builder.Logging.SetMinimumLevel(LogLevel.Information);
 
 builder.Services.AddAntDesign();
 
-builder.Services.AddScoped<IPermafnotesRepository, Repositoy>();
-builder.Services.AddScoped<MicrosoftGraphFile>();
 builder.Services.AddScoped<NoteService>();
+builder.Services.AddScoped<IPermafnotesRepository, Repositoy>(provider => 
+{
+    var client = provider.GetRequiredService<GraphServiceClient>();
+    var logger = provider.GetRequiredService<ILogger<NoteService>>();
+    return Repositoy.CreateRepository(client, logger);
+});
 
 await builder.Build().RunAsync();

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace PermafnotesRepositoryByFile
 {
     internal record PermafnotesNoteFile(string Name);
-    public class MicrosoftGraphFile
+    internal class MicrosoftGraphFile : IFileService
     {
         private static Encoding s_encoding = Encoding.GetEncoding("UTF-8");
         private static string s_cacheName = "cache.json";
@@ -51,7 +51,7 @@ namespace PermafnotesRepositoryByFile
         }
 
 
-        public MicrosoftGraphFile(GraphServiceClient graphServiceClient, ILogger<NoteService> logger, string baseDirectoryPathFromRoot = @"")
+        internal MicrosoftGraphFile(GraphServiceClient graphServiceClient, ILogger<NoteService> logger, string baseDirectoryPathFromRoot = @"")
         {
             this._graphServiceClient = graphServiceClient;
             this._logger = logger;
@@ -62,19 +62,18 @@ namespace PermafnotesRepositoryByFile
             this._baseDirectoryPathFromRoot = baseDirectoryPathFromRoot;
         }
 
-        internal async Task<IEnumerable<PermafnotesNoteFile>> FetchChildren ()
-        {
-            return (await _graphServiceClient.Me.Drive.Root
+        public async Task<IEnumerable<PermafnotesNoteFile>> FetchChildren()
+            => (await _graphServiceClient.Me.Drive.Root
                 .ItemWithPath(this.NotePathFromRoot).Children
                 .Request().GetAsync())
                 .Select(x => new PermafnotesNoteFile(x.Name)).ToList();
-        }
 
-        internal async Task<string> ReadNote(string name)
+        public async Task<string> ReadNote(string name)
         {
             return await this.ReadFile($"{this.NotePathFromRoot}/{name}");
         }
-        internal async Task<string> ReadCache()
+
+        public async Task<string> ReadCache()
         {
             if (!(await ExistsPath(this.CacheDirectoryFromRoot, s_cacheName)))
                 return string.Empty;
@@ -94,17 +93,17 @@ namespace PermafnotesRepositoryByFile
             return text;
         }
 
-        internal async Task WriteNote(string fileName, string text)
+        public async Task WriteNote(string fileName, string text)
         {
             await this.WriteFile($@"{this.NotePathFromRoot}/{fileName}", text);
         }
 
-        internal async Task WriteCache(string text)
+        public async Task WriteCache(string text)
         {
             await this.WriteFile(this.CachePathFromRoot, text);
         }
 
-        internal async Task Export(string fileName, string text)
+        public async Task Export(string fileName, string text)
         {
             await this.WriteFile($@"{this.ExportDestinationPathFromRoot}/{fileName}", text);
         }

@@ -16,18 +16,21 @@ namespace PermafnotesRepositoryByFile
         private static string s_noteFileDateTimeFormat = "yyyyMMddHHmmssfffffff";
         private static Encoding s_encoding = Encoding.GetEncoding("UTF-8");
 
-        // TODO: NoteService -> Repository
-        private MicrosoftGraphFile _fileService;
+        private IFileService _fileService;
         private ILogger<NoteService> _logger;
 
         private IEnumerable<NoteListModel> _noteRecords = new List<NoteListModel>();
 
-        public Repositoy(MicrosoftGraphFile fileService, ILogger<NoteService> logger)
+        public static Repositoy CreateRepository(GraphServiceClient graphServiceClient, ILogger<NoteService> logger)
+        {
+            return new Repositoy(new MicrosoftGraphFile(graphServiceClient, logger), logger);
+        }
+
+        internal Repositoy(IFileService fileService, ILogger<NoteService> logger)
         {
             this._fileService = fileService;
             this._logger = logger;
         }
-
 
         public async Task<IEnumerable<NoteListModel>> Add(NoteFormModel input)
         {
