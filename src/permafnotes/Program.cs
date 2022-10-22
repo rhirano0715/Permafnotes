@@ -28,6 +28,7 @@ builder.Logging.SetMinimumLevel(LogLevel.Information);
 builder.Services.AddAntDesign();
 
 builder.Services.AddScoped<IPermafnotesRepository, Repositoy>();
+builder.Services.AddScoped<MicrosoftGraphFile>();
 builder.Services.AddScoped<NoteService>();
 
 await builder.Build().RunAsync();

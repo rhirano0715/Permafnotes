@@ -14,28 +14,20 @@ namespace PermafnotesRepositoryByFile
     public class Repositoy : IPermafnotesRepository
     {
         private static string s_noteFileDateTimeFormat = "yyyyMMddHHmmssfffffff";
-        private static string s_cacheName = "cache.json";
         private static Encoding s_encoding = Encoding.GetEncoding("UTF-8");
 
-        private GraphServiceClient _graphServiceClient;
+        // TODO: NoteService -> Repository
+        private MicrosoftGraphFile _fileService;
         private ILogger<NoteService> _logger;
-
-        private string _permafnotesBaseFolderPathFromRoot = string.Empty;
-        private string _notesPathFromRoot = string.Empty;
-        private string _exportDestinationFolderPathFromRoot = string.Empty;
-        private string _cachePathFromRoot = string.Empty;
 
         private IEnumerable<NoteListModel> _noteRecords = new List<NoteListModel>();
 
-        public Repositoy(GraphServiceClient graphServiceClient, ILogger<NoteService> logger, string permafnotesBaseFolderPathFromRoot= @"Application/Permafnotes")
+        public Repositoy(MicrosoftGraphFile fileService, ILogger<NoteService> logger)
         {
-            this._graphServiceClient = graphServiceClient;
+            this._fileService = fileService;
             this._logger = logger;
-            this._permafnotesBaseFolderPathFromRoot = permafnotesBaseFolderPathFromRoot;
-            this._notesPathFromRoot = $@"{_permafnotesBaseFolderPathFromRoot}/notes";
-            this._exportDestinationFolderPathFromRoot = $@"{_permafnotesBaseFolderPathFromRoot}/exports";
-            this._cachePathFromRoot = $@"{_permafnotesBaseFolderPathFromRoot}/{s_cacheName}";
         }
+
 
         public async Task<IEnumerable<NoteListModel>> Add(NoteFormModel input)
         {
@@ -54,12 +46,9 @@ namespace PermafnotesRepositoryByFile
             if (onlyCache)
                 return this.OrderByDescendingNoteRecords();
 
-            IDriveItemChildrenCollectionPage children = await _graphServiceClient.Me.Drive.Root
-                .ItemWithPath(_notesPathFromRoot).Children
-                .Request().GetAsync();
-
+            var children = await this._fileService.FetchChildren();
             List<NoteListModel> result = this._noteRecords.ToList();
-            foreach (DriveItem child in children)
+            foreach (PermafnotesNoteFile child in children)
             {
                 _logger.LogDebug($"Fetch start {child.Name}");
                 if (result.Any(x => $"{x.Created.ToString(s_noteFileDateTimeFormat)}.json" == child.Name))
@@ -69,14 +58,7 @@ namespace PermafnotesRepositoryByFile
                 }
 
                 _logger.LogWarning($"{child.Name} is not exists in cache. Loading this.");
-                using MemoryStream ms = new();
-                using Stream stream = await _graphServiceClient.Me.Drive.Root
-                    .ItemWithPath($"{_notesPathFromRoot}/{child.Name}").Content
-                    .Request().GetAsync();
-
-                await stream.CopyToAsync(ms);
-
-                string text = s_encoding.GetString(ms.ToArray());
+                string text = await this._fileService.ReadNote(child.Name);
                 NoteListModel? model = JsonSerializer.Deserialize<NoteListModel>(text);
                 if (model is null)
                 {
@@ -100,9 +82,9 @@ namespace PermafnotesRepositoryByFile
                 sb.Append(string.Format(lineFormat, record.Title, record.Source, record.Memo, record.Tags, record.Reference, record.Created));
             }
 
-            string uploadPath = $"{_exportDestinationFolderPathFromRoot}/{DateTime.Now.ToString(s_noteFileDateTimeFormat)}.tsv";
+            string uploadName = $"{DateTime.Now.ToString(s_noteFileDateTimeFormat)}.tsv";
 
-            await this.PutTextFile(uploadPath, sb.ToString());
+            await this._fileService.Export(uploadName, sb.ToString());
         }
 
         public async Task Import(byte[] inputBuffers)
@@ -140,7 +122,6 @@ namespace PermafnotesRepositoryByFile
 
         private async Task PutNoteListModel(NoteListModel noteListModel)
         {
-            string uploadPath = $"{_notesPathFromRoot}/{noteListModel.Created.ToString(s_noteFileDateTimeFormat)}.json";
             JsonSerializerOptions options = new()
             {
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.
@@ -148,8 +129,9 @@ namespace PermafnotesRepositoryByFile
             };
 
             string uploadText = JsonSerializer.Serialize<NoteListModel>(noteListModel, options);
+            string uploadName = $"{noteListModel.Created.ToString(s_noteFileDateTimeFormat)}.json";
 
-            await this.PutTextFile(uploadPath, uploadText);
+            await this._fileService.WriteNote(uploadName, uploadText);
         }
 
         private void AddToNoteRecords(NoteListModel noteListModel)
@@ -164,31 +146,12 @@ namespace PermafnotesRepositoryByFile
             this._noteRecords = result;
         }
 
-        private async Task PutTextFile(string pathFromRoot, string text)
-        {
-            using var stream = new MemoryStream(
-                s_encoding.GetBytes(text)
-            );
-
-            var uploadedItem = await _graphServiceClient.Drive.Root
-                .ItemWithPath(pathFromRoot).Content.Request()
-                .PutAsync<DriveItem>(stream);
-        }
-
         private async Task<IEnumerable<NoteListModel>> LoadCache()
         {
-            _logger.LogDebug($"Loading cache {_cachePathFromRoot}");
-            if (!(await ExistsPath(_permafnotesBaseFolderPathFromRoot, s_cacheName)))
+            string text = await this._fileService.ReadCache();
+            if (string.IsNullOrEmpty(text))
                 return this.OrderByDescendingNoteRecords();
 
-            using MemoryStream ms = new();
-            using Stream stream = await _graphServiceClient.Me.Drive.Root
-                .ItemWithPath(_cachePathFromRoot).Content
-                .Request().GetAsync();
-
-            await stream.CopyToAsync(ms);
-
-            string text = s_encoding.GetString(ms.ToArray());
             List<NoteListModel>? result = JsonSerializer.Deserialize<List<NoteListModel>>(text);
             if (result is null)
                 return this.OrderByDescendingNoteRecords();
@@ -198,7 +161,6 @@ namespace PermafnotesRepositoryByFile
 
         private async Task SaveCache(IEnumerable<NoteListModel> noteListModels)
         {
-            _logger.LogDebug($"Saving cache {_cachePathFromRoot}");
             JsonSerializerOptions options = new()
             {
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.
@@ -207,15 +169,7 @@ namespace PermafnotesRepositoryByFile
 
             string uploadText = JsonSerializer.Serialize<IEnumerable<NoteListModel>>(noteListModels, options);
 
-            await this.PutTextFile(_cachePathFromRoot, uploadText);
-        }
-
-        private async Task<bool> ExistsPath(string folderPath, string name)
-        {
-            IDriveItemChildrenCollectionPage children = await _graphServiceClient.Me.Drive.Root
-                .ItemWithPath(folderPath).Children
-                .Request().GetAsync();
-            return children.Any(x => x.Name == name);
+            await this._fileService.WriteCache(uploadText);
         }
     }
 }
