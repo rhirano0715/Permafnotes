@@ -1,6 +1,6 @@
 namespace PermafnotesRepositoryByFile
 {
-    public class Tests
+    public class RepositoryTest
     {
         [SetUp]
         public void Setup()
