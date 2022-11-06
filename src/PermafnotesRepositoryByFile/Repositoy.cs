@@ -17,16 +17,16 @@ namespace PermafnotesRepositoryByFile
         private static Encoding s_encoding = Encoding.GetEncoding("UTF-8");
 
         private IFileService _fileService;
-        private ILogger<NoteService> _logger;
+        private ILogger _logger;
 
         private IEnumerable<NoteListModel> _noteRecords = new List<NoteListModel>();
 
-        public static Repositoy CreateRepositoryUsingMsGraph(GraphServiceClient graphServiceClient, ILogger<NoteService> logger)
+        public static Repositoy CreateRepositoryUsingMsGraph(GraphServiceClient graphServiceClient, ILogger logger)
         {
             return new Repositoy(new MicrosoftGraphFileService(graphServiceClient, logger), logger);
         }
 
-        internal Repositoy(IFileService fileService, ILogger<NoteService> logger)
+        internal Repositoy(IFileService fileService, ILogger logger)
         {
             this._fileService = fileService;
             this._logger = logger;

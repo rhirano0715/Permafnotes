@@ -16,7 +16,7 @@ namespace PermafnotesRepositoryByFile
         private static string s_cacheName = "cache.json";
 
         private GraphServiceClient _graphServiceClient;
-        private ILogger<NoteService> _logger;
+        private ILogger _logger;
         private string _baseDirectoryPathFromRoot = @"Application/Permafnotes";
 
         private string NotePathFromRoot
@@ -51,7 +51,7 @@ namespace PermafnotesRepositoryByFile
         }
 
 
-        internal MicrosoftGraphFileService(GraphServiceClient graphServiceClient, ILogger<NoteService> logger, string baseDirectoryPathFromRoot = @"")
+        internal MicrosoftGraphFileService(GraphServiceClient graphServiceClient, ILogger logger, string baseDirectoryPathFromRoot = @"")
         {
             this._graphServiceClient = graphServiceClient;
             this._logger = logger;
