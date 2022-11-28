@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
 using PermafnotesDomain.Models;
+using System;
 
 namespace PermafnotesRepositoryByFile
 {
@@ -30,7 +32,7 @@ namespace PermafnotesRepositoryByFile
             public async Task WhenNotExistsCache()
             {
                 // TODO: dynamic
-                string baseDirectoryPath = @"C:\Users\r-h-0\source\repos\github\rhirano0715\permafnotes\src\PermafnotesRepositoryByFileTest\TestData\Input";
+                string baseDirectoryPath = @"..\..\..\TestData\Input";
                 string cachePath = Path.Combine(baseDirectoryPath, "cache.json");
                 if (File.Exists(cachePath))
                     File.Delete(cachePath);
