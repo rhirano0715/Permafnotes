@@ -26,7 +26,12 @@ namespace PermafnotesRepositoryByFile
             return new Repositoy(new MicrosoftGraphFileService(graphServiceClient, logger), logger);
         }
 
-        internal Repositoy(IFileService fileService, ILogger logger)
+        public static Repositoy CreateRepositoryUsingFileSystem(ILogger logger, string baseDirectoryPath)
+        {
+            return new Repositoy(new FileSystemService(logger, baseDirectoryPath), logger);
+        }
+
+        private Repositoy(IFileService fileService, ILogger logger)
         {
             this._fileService = fileService;
             this._logger = logger;

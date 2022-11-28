@@ -1,10 +1,11 @@
 ﻿namespace PermafnotesDomain.Models;
 
-using System.ComponentModel;
 using System.Text.RegularExpressions;
 
 public record NoteListModel
 {
+    private static Regex s_regexTagDelimiter = new(@",");
+
     public string Title { get; set; } = string.Empty;
 
     public string Source { get; set; } = string.Empty;
@@ -16,8 +17,6 @@ public record NoteListModel
     public string Reference { get; set; } = string.Empty;
 
     public DateTime Created { get; set; } = DateTime.MinValue;
-
-    private Regex _regexTagDelimiter = new(@",");
 
     public NoteListModel() { }
 
@@ -31,11 +30,11 @@ public record NoteListModel
         this.Created = DateTime.Now;
     }
 
-    public override string ToString()
-        => $"{Title}, {Source}, {Memo}, {Tags}, {Reference}, {Created}";
+    //public override string ToString()
+    //    => $"{Title}, {Source}, {Memo}, {Tags}, {Reference}, {Created}";
 
     public IEnumerable<NoteTagModel> SplitTags()
     {
-        return _regexTagDelimiter.Split(Tags).Select(x => new NoteTagModel(x.Trim()));
+        return s_regexTagDelimiter.Split(Tags).Select(x => new NoteTagModel(x.Trim()));
     }
 }
