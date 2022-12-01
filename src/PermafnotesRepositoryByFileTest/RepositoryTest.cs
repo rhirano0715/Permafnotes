@@ -28,17 +28,21 @@ namespace PermafnotesRepositoryByFile
 
         public class FetchAllTest
         {
+            private static readonly string s_baseDirectoryPath = @"..\..\..\TestData\Input";
+            private string _cachePath = Path.Combine(s_baseDirectoryPath, "cache.json");
+
+            [SetUp]
+            public void Setup()
+            {
+                if (File.Exists(_cachePath))
+                    File.Delete(_cachePath);
+            }
+
             [Test]
             public async Task WhenNotExistsCache()
             {
-                // TODO: dynamic
-                string baseDirectoryPath = @"..\..\..\TestData\Input";
-                string cachePath = Path.Combine(baseDirectoryPath, "cache.json");
-                if (File.Exists(cachePath))
-                    File.Delete(cachePath);
-
                 ILogger logger = new MockLogger();
-                Repositoy repository = Repositoy.CreateRepositoryUsingFileSystem(logger, baseDirectoryPath);
+                Repositoy repository = Repositoy.CreateRepositoryUsingFileSystem(logger, s_baseDirectoryPath);
 
                 IEnumerable<NoteListModel> expected = new List<NoteListModel>()
                 {
