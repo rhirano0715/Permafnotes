@@ -7,6 +7,15 @@ namespace PermafnotesRepositoryByFile
 {
     class MockLogger : ILogger
     {
+        public IEnumerable<string> History
+        {
+            get
+            {
+                foreach (var h in _history)
+                    yield return h;
+            }
+        }
+
         private List<string> _history = new();
 
         public IDisposable BeginScope<TState>(TState state) => default;
@@ -44,7 +53,7 @@ namespace PermafnotesRepositoryByFile
             public async Task WhenNotExistsCache()
             {
                 // Arrange
-                ILogger logger = new MockLogger();
+                MockLogger logger = new MockLogger();
 
                 DirectoryInfo baseDir = new(Path.Combine(s_fetchAllTestBaseDirectoryPath, "WhenNotExistsCache"));
                 DirectoryInfo inputAndActualDir = new(Path.Combine(baseDir.ToString(), "InputAndActual"));
@@ -71,6 +80,13 @@ namespace PermafnotesRepositoryByFile
                 }.OrderByDescending(x => x.Created);
                 Assert.That(actual, Is.EqualTo(expected));
 
+                IEnumerable<string> logExpected = new List<string>()
+                {
+                    "Debug Fetch start 202208232012552680000.json",
+                    "Warning 202208232012552680000.json is not exists in cache. Loading this.",
+                };
+                Assert.That(logger.History, Is.EqualTo(logExpected));
+
                 DirectoryInfo expectedDir = new(Path.Combine(baseDir.ToString(), "Expected"));
                 FileAssert.AreEqual(CreateCacheJsonFileInfo(expectedDir), CreateCacheJsonFileInfo(inputAndActualDir));
             }
@@ -79,13 +95,15 @@ namespace PermafnotesRepositoryByFile
             public async Task WhenExistsCache()
             {
                 // Arrange
-                ILogger logger = new MockLogger();
+                MockLogger logger = new MockLogger();
 
                 DirectoryInfo baseDir = new(Path.Combine(s_fetchAllTestBaseDirectoryPath, "WhenExistsCache"));
                 DirectoryInfo inputAndActualDir = new(Path.Combine(baseDir.ToString(), "InputAndActual"));
+                FileInfo inputcachePath = new(Path.Combine(inputAndActualDir.ToString(), "cache.input.json"));
                 FileInfo cachePath = new(Path.Combine(inputAndActualDir.ToString(), "cache.json"));
                 if (cachePath.Exists)
                     cachePath.Delete();
+                inputcachePath.CopyTo(cachePath.ToString());
 
                 Repositoy repository = Repositoy.CreateRepositoryUsingFileSystem(logger, inputAndActualDir.ToString());
 
@@ -114,9 +132,21 @@ namespace PermafnotesRepositoryByFile
                 }.OrderByDescending(x => x.Created);
                 Assert.That(actual, Is.EqualTo(expected), "FetchAll's return don't match the expected");
 
+
+                IEnumerable<string> logExpected = new List<string>()
+                {
+                    "Debug Fetch start 202208232012552680000.json",
+                    "Debug 202208232012552680000.json's cache is exists",
+                    "Debug Fetch start 202211232012552680000.json",
+                    "Warning 202211232012552680000.json is not exists in cache. Loading this.",
+                };
+                Assert.That(logger.History, Is.EqualTo(logExpected));
+
                 DirectoryInfo expectedDir = new(Path.Combine(baseDir.ToString(), "Expected"));
                 FileAssert.AreEqual(CreateCacheJsonFileInfo(expectedDir), CreateCacheJsonFileInfo(inputAndActualDir), "Result's cache.json dont't match the expected");
             }
         }
+    
+        // TODO: Add test. when add note.
     }
 }
