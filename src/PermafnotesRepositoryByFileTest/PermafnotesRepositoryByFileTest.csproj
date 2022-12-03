@@ -20,8 +20,4 @@
     <ProjectReference Include="..\PermafnotesRepositoryByFile\PermafnotesRepositoryByFile.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="TestData\Input\notes\" />
-  </ItemGroup>
-
 </Project>
