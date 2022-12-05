@@ -37,6 +37,9 @@ namespace PermafnotesRepositoryByFile
         {
         }
 
+        private FileInfo CreateNoteFileInfo(DirectoryInfo directoryInfo, string noteFileName)
+            => new(Path.Combine(directoryInfo.ToString(), noteFileName));
+
         public class FetchAllTest
         {
             private static readonly string s_fetchAllTestBaseDirectoryPath = Path.Combine(s_baseDirectoryPath, "FetchAllTest");
@@ -146,7 +149,52 @@ namespace PermafnotesRepositoryByFile
                 FileAssert.AreEqual(CreateCacheJsonFileInfo(expectedDir), CreateCacheJsonFileInfo(inputAndActualDir), "Result's cache.json dont't match the expected");
             }
         }
-    
-        // TODO: Add test. when add note.
+
+        [Test]
+        public async Task AddCacheTest()
+        {
+            // Arrange
+            MockLogger logger = new MockLogger();
+
+            DirectoryInfo baseDir = new(Path.Combine(s_baseDirectoryPath, "AddCacheTest"));
+            DirectoryInfo inputAndActualDir = new(Path.Combine(baseDir.ToString(), "InputAndActual"));
+            FileInfo cachePath = new(Path.Combine(inputAndActualDir.ToString(), "cache.json"));
+            if (cachePath.Exists)
+                cachePath.Delete();
+
+            Repositoy repository = Repositoy.CreateRepositoryUsingFileSystem(logger, inputAndActualDir.ToString());
+
+            NoteListModel noteListModel = new()
+            {
+                Title = "Title1",
+                Source = "Source1",
+                Memo = "Memo1",
+                Tags = "Tag1" ,
+                Reference = "Reference1",
+                Created = DateTime.Parse("2022-08-23T20:12:55.268+09:00"),
+            };
+
+            // Act
+            var actual = await repository.Add(noteListModel);
+
+            // Assert
+            IEnumerable<NoteListModel> expected = new List<NoteListModel>()
+            {
+                new NoteListModel(){
+                    Title = "Title1",
+                    Source = "Source1",
+                    Memo = "Memo1",
+                    Tags = "Tag1",
+                    Reference = "Reference1",
+                    Created = DateTime.Parse("2022-08-23T20:12:55.268+09:00")
+                }
+            }.OrderByDescending(x => x.Created);
+            Assert.That(actual, Is.EqualTo(expected), "FetchAll's return don't match the expected");
+
+            DirectoryInfo actualDir = new(Path.Combine(inputAndActualDir.ToString(), "notes"));
+            DirectoryInfo expectedDir = new(Path.Combine(baseDir.ToString(), "Expected/notes"));
+            string expectedNoteFileName = "202208232012552680000.json";
+            FileAssert.AreEqual(CreateNoteFileInfo(expectedDir, expectedNoteFileName), CreateNoteFileInfo(actualDir, expectedNoteFileName));
+        }
     }
 }

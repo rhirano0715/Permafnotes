@@ -20,4 +20,8 @@
     <ProjectReference Include="..\PermafnotesRepositoryByFile\PermafnotesRepositoryByFile.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="TestData\AddCacheTest\InputAndActual\" />
+  </ItemGroup>
+
 </Project>

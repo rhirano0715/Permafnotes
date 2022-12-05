@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Graph;
 using PermafnotesDomain.Services;
 using System;
 using System.Collections.Generic;
@@ -84,9 +85,13 @@ namespace PermafnotesRepositoryByFile
             writer.Write(text);
         }
 
-        Task IFileService.WriteNote(string fileName, string text)
+        public async Task WriteNote(string fileName, string text)
         {
-            throw new NotImplementedException();
+            if (!this.NoteDirectory.Exists)
+                this.NoteDirectory.Create();
+            FileInfo outputFile = new (Path.Combine(this.NoteDirectory.ToString(), fileName));
+            using var writer = new StreamWriter(outputFile.ToString(), append: false, encoding: s_encoding);
+            writer.Write(text);
         }
 
         private string ReadFileAsString(string filePath)

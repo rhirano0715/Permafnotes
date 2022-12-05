@@ -18,7 +18,7 @@ namespace PermafnotesDomain.Services
         }
 
         public async Task<IEnumerable<NoteListModel>> Add(NoteFormModel input)
-            => await this._repository.Add(input);
+            => await this._repository.Add(new NoteListModel(input));
 
         public async Task<IEnumerable<NoteListModel>> FetchAll(bool onlyCache = false)
             => await this._repository.FetchAll(onlyCache);

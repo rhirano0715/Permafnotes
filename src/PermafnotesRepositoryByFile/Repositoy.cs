@@ -37,10 +37,8 @@ namespace PermafnotesRepositoryByFile
             this._logger = logger;
         }
 
-        public async Task<IEnumerable<NoteListModel>> Add(NoteFormModel input)
+        public async Task<IEnumerable<NoteListModel>> Add(NoteListModel noteListModel)
         {
-            NoteListModel noteListModel = new(input);
-
             await PutNoteListModel(noteListModel);
 
             this.AddToNoteRecords(noteListModel);
@@ -103,7 +101,7 @@ namespace PermafnotesRepositoryByFile
 
             foreach (var record in csv.GetRecords<NoteFormModel>())
             {
-                await this.Add(record);
+                await this.Add(new NoteListModel(record));
             }
         }
 
