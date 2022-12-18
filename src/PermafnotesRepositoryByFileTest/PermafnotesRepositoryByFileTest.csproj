@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="TestData\AddCacheTest\**" />
+    <EmbeddedResource Remove="TestData\AddCacheTest\**" />
+    <None Remove="TestData\AddCacheTest\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
@@ -18,10 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PermafnotesRepositoryByFile\PermafnotesRepositoryByFile.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="TestData\AddCacheTest\InputAndActual\" />
   </ItemGroup>
 
 </Project>

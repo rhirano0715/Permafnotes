@@ -151,12 +151,12 @@ namespace PermafnotesRepositoryByFile
         }
 
         [Test]
-        public async Task AddCacheTest()
+        public async Task AddTest()
         {
             // Arrange
             MockLogger logger = new MockLogger();
 
-            DirectoryInfo baseDir = new(Path.Combine(s_baseDirectoryPath, "AddCacheTest"));
+            DirectoryInfo baseDir = new(Path.Combine(s_baseDirectoryPath, "AddTest"));
             DirectoryInfo inputAndActualDir = new(Path.Combine(baseDir.ToString(), "InputAndActual"));
             FileInfo cachePath = new(Path.Combine(inputAndActualDir.ToString(), "cache.json"));
             if (cachePath.Exists)
@@ -195,6 +195,33 @@ namespace PermafnotesRepositoryByFile
             DirectoryInfo expectedDir = new(Path.Combine(baseDir.ToString(), "Expected/notes"));
             string expectedNoteFileName = "202208232012552680000.json";
             FileAssert.AreEqual(CreateNoteFileInfo(expectedDir, expectedNoteFileName), CreateNoteFileInfo(actualDir, expectedNoteFileName));
+        }
+
+        [Test]
+        public async Task SelectAllTagsTest()
+        {
+            // Arrange
+            MockLogger logger = new MockLogger();
+
+            DirectoryInfo baseDir = new(Path.Combine(s_baseDirectoryPath, "SelectAllTagsTest"));
+            DirectoryInfo inputAndActualDir = new(Path.Combine(baseDir.ToString(), "InputAndActual"));
+            FileInfo cachePath = new(Path.Combine(inputAndActualDir.ToString(), "cache.json"));
+            if (cachePath.Exists)
+                cachePath.Delete();
+
+            Repositoy repository = Repositoy.CreateRepositoryUsingFileSystem(logger, inputAndActualDir.ToString());
+            await repository.FetchAll();
+
+            // Act
+            var actual = repository.SelectAllTags();
+
+            // Assert
+            IEnumerable<NoteTagModel> expected = new List<NoteTagModel>()
+            {
+                new NoteTagModel("Tag1")
+            };
+
+            Assert.That(actual, Is.EqualTo(expected), "SelectAllTags's return don't match the expected");
         }
     }
 }
