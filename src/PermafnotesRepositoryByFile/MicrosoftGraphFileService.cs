@@ -63,10 +63,23 @@ namespace PermafnotesRepositoryByFile
         }
 
         public async Task<IEnumerable<PermafnotesNoteFile>> FetchChildren()
-            => (await _graphServiceClient.Me.Drive.Root
+        {
+            var response = await _graphServiceClient.Me.Drive.Root
                 .ItemWithPath(this.NotePathFromRoot).Children
-                .Request().GetAsync())
-                .Select(x => new PermafnotesNoteFile(x.Name)).ToList();
+                .Request()
+                .GetAsync();
+
+            var result = response.Select(x => new PermafnotesNoteFile(x.Name)).ToList();
+            var npr = response.NextPageRequest;
+            while(npr is not null)
+            {
+                var next = await npr.GetAsync();
+                result.AddRange(next.Select(x => new PermafnotesNoteFile(x.Name)));
+                npr = next.NextPageRequest;
+            }
+
+            return result;
+        }
 
         public async Task<string> ReadNote(string name)
         {
