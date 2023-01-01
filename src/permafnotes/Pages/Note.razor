@@ -73,18 +73,27 @@
     </SpaceItem>
 </Space>
 
-<Table TItem="NoteListModel" DataSource="@NoteRecords">
-    <Column @bind-Field="context.Title"  TData="string" Sortable Filterable />
-    <Column @bind-Field="context.Source" TData="string" Sortable Filterable />
-    <Column @bind-Field="context.Memo"   TData="string" Sortable Filterable />
-    <Column Title="Tags"                 TData="string" Sortable Filterable >
+<Table TItem="NoteListModel" DataSource="@NoteRecords" Size="TableSize.Middle" >
+    <Column @bind-Field="context.Title"  TData="string" Sortable Filterable Width="10%" />
+    <Column @bind-Field="context.Source" TData="string" Sortable Filterable Width="30%" />
+    <Column @bind-Field="context.Memo" TData="string" Sortable Filterable Width="30%" />
+    <Column Title="Tags" TData="string" Sortable Filterable Width="10%">
         @foreach (var tag in context.SplitTags())
         {
             <Tag Color="green">@(string.IsNullOrEmpty(tag.Name) ? string.Empty : tag.Name)</Tag>
         }
     </Column>
-    <Column @bind-Field="context.Reference" TData="string"   Sortable Filterable />
-    <Column @bind-Field="context.Created"   TData="DateTime" Sortable Filterable />
+    <Column Title="Reference"            TData="string"   Sortable Filterable Width="10%" >
+        @if (context.Reference.StartsWith("http://") || context.Reference.StartsWith("https://"))
+        {
+            <a href="@context.Reference">@context.Reference</a>
+        }
+        else
+        {
+            @context.Reference
+        }
+    </Column>
+    <Column @bind-Field="context.Created" TData="DateTime" Sortable Filterable Width="10%" />
 </Table>
 
 @code {
