@@ -67,6 +67,12 @@
     </SpaceItem>
 </Space>
 
+<Space>
+    <SpaceItem>
+        <Button Type="@ButtonType.Primary" OnClick="Refresh">Reflesh</Button>
+    </SpaceItem>
+</Space>
+
 <Table TItem="NoteListModel" DataSource="@NoteRecords">
     <Column @bind-Field="context.Title"  TData="string" Sortable Filterable />
     <Column @bind-Field="context.Source" TData="string" Sortable Filterable />
@@ -96,10 +102,20 @@
 
     private IEnumerable<IBrowserFile> _choosenFiles = new List<IBrowserFile>();
 
+    private Timer _refleshers;
+
     protected override async Task OnInitializedAsync()
     {
-        await this.RefreshList();
-        // TODO: If nothing else, create a few samples
+        await this.RefreshList(onlyCache: true);
+
+        _refleshers = new Timer(_ =>
+        {
+            _ = InvokeAsync(async () =>
+            {
+                await this.RefreshList();
+                StateHasChanged();
+            });
+        }, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
 
         await base.OnInitializedAsync();
     }
@@ -140,6 +156,9 @@
                 Tags = this._noteFormModel.Tags,
                 Reference = string.Empty
             };
+
+    private async Task Refresh()
+        => await this.RefreshList();
 
     private async Task RefreshList(bool onlyCache = false)
     {
