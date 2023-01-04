@@ -6,6 +6,7 @@
 @using System.Text
 @using System.ComponentModel
 @using System.ComponentModel.DataAnnotations
+@using System.Text.Json;
 
 @using AntDesign
 @using AntDesign.TableModels
@@ -17,63 +18,85 @@
 
 @inject NoteService NoteService
 
-<Form Model="@_noteFormModel" OnFinish="OnFinish" OnFinishFailed="OnFinishFailed">
-    <FormItem Label="Title">
-        <Input @bind-Value="@context.Title" />
-    </FormItem>
-    <FormItem Label="Tags">
-        <Select Mode="tags"
-		        @bind-Values="@context.Tags"
-		        Placeholder="Please select"
-		        TItemValue="string"
-		        TItem="string"
-		        Size="@_sizeValue"
-		        OnSelectedItemsChanged="OnSelectedItemsChangedHandler">
-		        <SelectOptions>
-			        @foreach(var tag in Tags)
-			        {
-				        <SelectOption TItemValue="string" TItem="string" Value=@tag.Name Label=@tag.Name />
-			        }
-		        </SelectOptions>
-        </Select>
-    </FormItem>
-    <FormItem Label="Reference">
-        <Input @bind-Value="@context.Reference" />
-    </FormItem>
-    <FormItem Label="Source">
-        <TextArea @bind-Value="@context.Source" MinRows="@_minRows" />
-    </FormItem>
-    <FormItem Label="Memo">
-        <TextArea @bind-Value="@context.Memo" MinRows="@_minRows" />
-    </FormItem>
-    <FormItem>
-        <Button Type="@ButtonType.Primary" HtmlType="submit">Add</Button>
-    </FormItem>
-</Form>
+<div class="note_form">
+    <Title>Note</Title>
+    <Form Model="@_noteFormModel" OnFinish="OnFinish" OnFinishFailed="OnFinishFailed">
+        <FormItem Label="Title">
+            <Input @bind-Value="@context.Title" ReadOnly/>
+        </FormItem>
+        <FormItem Label="Tags">
+            <Select Mode="tags"
+                    @bind-Values="@context.Tags"
+                    Placeholder="Please select"
+                    TItemValue="string"
+                    TItem="string"
+                    Size="@_sizeValue"
+                    OnSelectedItemsChanged="OnSelectedItemsChangedHandler">
+                <SelectOptions>
+                    @foreach (var tag in Tags)
+                    {
+                        <SelectOption TItemValue="string" TItem="string" Value=@tag.Name Label=@tag.Name />
+                    }
+                </SelectOptions>
+            </Select>
+        </FormItem>
+        <FormItem Label="Reference">
+            <Input @bind-Value="@context.Reference" />
+        </FormItem>
+        <FormItem Label="Source">
+            <TextArea @bind-Value="@context.Source" MinRows="@_minRows" ReadOnly/>
+        </FormItem>
+        <FormItem Label="Memo">
+            <TextArea @bind-Value="@context.Memo" MinRows="@_minRows" ReadOnly/>
+        </FormItem>
+        <FormItem>
+            <Button Type="@ButtonType.Primary" HtmlType="submit">Submit</Button>
+            <Button Type="@ButtonType.Primary" OnClick="ClearForm">Clear</Button>
+        </FormItem>
+    </Form>
+</div>
 
 
-<Space>
-    <SpaceItem>
-        <InputFile OnChange="@ChooseFiles" multiple />
-    </SpaceItem>
-    <SpaceItem>
-        <Button Type="@ButtonType.Primary" OnClick="Import" Danger >Import</Button>
-    </SpaceItem>
-    <SpaceItem>
-        <Button Type="@ButtonType.Primary" OnClick="Export" >Export</Button>
-    </SpaceItem>
-    <SpaceItem>
-        <Button Type="@ButtonType.Primary" OnClick="ClearForm" >Clear</Button>
-    </SpaceItem>
-</Space>
+<div class="import_export">
+    <Title>Import / Export</Title>
+    <Space>
+        <SpaceItem>
+            <InputFile OnChange="@ChooseFiles" multiple />
+        </SpaceItem>
+        <SpaceItem>
+            <Button Type="@ButtonType.Primary" OnClick="Import" Danger>Import</Button>
+        </SpaceItem>
+        <SpaceItem>
+            <Button Type="@ButtonType.Primary" OnClick="Export">Export</Button>
+        </SpaceItem>
+    </Space>
+</div>
 
-<Space>
-    <SpaceItem>
-        <Button Type="@ButtonType.Primary" OnClick="Refresh">Reflesh</Button>
-    </SpaceItem>
-</Space>
+<br />
 
-<Table TItem="NoteListModel" DataSource="@NoteRecords" Size="TableSize.Middle" >
+<div class="list_action">
+    <Title>Note list</Title>
+    <Space>
+        <SpaceItem>
+            <Button Type="@ButtonType.Primary" OnClick="Refresh">Reflesh</Button>
+        </SpaceItem>
+        <SpaceItem>
+            <Button Type="@ButtonType.Primary" OnClick="ClearListSelection">Clear selection</Button>
+        </SpaceItem>
+        @if(_selectedRows.Count() == 1)
+        {
+            <SpaceItem>
+                <Button Type="@ButtonType.Primary" OnClick="StartEdit">StartEdit</Button>
+            </SpaceItem>
+
+        }
+    </Space>
+</div>
+
+<br />
+
+<Table @ref="_list" TItem="NoteListModel" DataSource="@NoteRecords" Size="TableSize.Middle" @bind-SelectedRows="_selectedRows" >
+    <Selection Key="@context.Created.ToString()" Type="radio" />
     <Column @bind-Field="context.Title"  TData="string" Sortable Filterable Width="10%" />
     <Column @bind-Field="context.Source" TData="string" Sortable Filterable Width="30%" />
     <Column @bind-Field="context.Memo" TData="string" Sortable Filterable Width="30%" />
@@ -100,6 +123,8 @@
     [Inject]
     private ILogger<Note> logger { get; set; }
 
+    ITable? _list;
+
     private string _sizeValue = AntSizeLDSType.Default;
     private uint _minRows = 4;
 
@@ -109,6 +134,7 @@
     private List<string> ToolbarItems = new List<string>() { "Search" };
     public IEnumerable<NoteListModel> NoteRecords { get; set; } = new List<NoteListModel>();
 
+    private IEnumerable<NoteListModel> _selectedRows = new List<NoteListModel>();
     private IEnumerable<IBrowserFile> _choosenFiles = new List<IBrowserFile>();
 
     private Timer _refleshers;
@@ -129,6 +155,17 @@
         await base.OnInitializedAsync();
     }
 
+    private async Task OnFinish(EditContext editContext)
+    {
+        await Add();
+        logger.LogDebug($"Success:{_noteFormModel.ToString()}");
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        logger.LogError($"Failed:{_noteFormModel.ToString()}");
+    }
+
     private async Task Add()
     {
         NoteRecords = await NoteService.Add(_noteFormModel);
@@ -138,11 +175,22 @@
         this.ClearForm();
     }
 
-    private async Task Export()
-        => await NoteService.Export(NoteRecords);
+    private void ClearForm()
+        => this._noteFormModel = new()
+            {
+                Title = this._noteFormModel.Title,
+                Source = string.Empty,
+                Memo = string.Empty,
+                Tags = this._noteFormModel.Tags,
+                Reference = string.Empty,
+                Created = DateTime.MinValue
+            };
 
     private void ChooseFiles(InputFileChangeEventArgs e)
         => _choosenFiles = e.GetMultipleFiles();
+
+    private async Task Export()
+        => await NoteService.Export(NoteRecords);
 
     private async Task Import()
     {
@@ -156,16 +204,6 @@
         await this.RefreshList();
     }
 
-    private void ClearForm()
-        => this._noteFormModel = new()
-            {
-                Title = this._noteFormModel.Title,
-                Source = string.Empty,
-                Memo = string.Empty,
-                Tags = this._noteFormModel.Tags,
-                Reference = string.Empty
-            };
-
     private async Task Refresh()
         => await this.RefreshList();
 
@@ -173,6 +211,22 @@
     {
         NoteRecords = await NoteService.FetchAll(onlyCache);
         Tags = NoteService.SelectAllTags();
+    }
+
+    private void StartEdit()
+    {
+        if (_selectedRows.Count() <= 0) 
+        {
+            return;
+        }
+        _noteFormModel = _selectedRows.First().ToNoteFormModel();
+    }
+
+    private void ClearListSelection()
+    {
+        if (_list is not null)
+            _list.SetSelection(null);
+        ClearForm();
     }
 
     private void OnRowClick(RowData<NoteListModel> row)
@@ -191,15 +245,5 @@
             logger.LogDebug($"selected: ${string.Join(",", values)}");
     }
 
-    private async Task OnFinish(EditContext editContext)
-    {
-        await Add();
-        logger.LogDebug($"Success:{_noteFormModel.ToString()}");
-    }
-
-    private void OnFinishFailed(EditContext editContext)
-    {
-        logger.LogError($"Failed:{_noteFormModel.ToString()}");
-    }
 }
 

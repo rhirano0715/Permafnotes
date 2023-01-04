@@ -39,9 +39,9 @@ namespace PermafnotesRepositoryByFile
 
         public async Task<IEnumerable<NoteListModel>> Add(NoteListModel noteListModel)
         {
-            await PutNoteListModel(noteListModel);
-
             this.AddToNoteRecords(noteListModel);
+
+            await PutNoteListModel(noteListModel);
 
             return this.OrderByDescendingNoteRecords();
         }
@@ -138,6 +138,15 @@ namespace PermafnotesRepositoryByFile
             string uploadName = $"{noteListModel.Created.ToString(s_noteFileDateTimeFormat)}.json";
 
             await this._fileService.WriteNote(uploadName, uploadText);
+
+            var cache = await this.LoadCache();
+            if (cache.Any(x => x.Created == noteListModel.Created))
+            {
+                var newCache = cache.Where(x => x.Created != noteListModel.Created).ToList();
+                newCache.Add(noteListModel);
+                _noteRecords = newCache;
+                await SaveCache(_noteRecords);
+            }
         }
 
         private void AddToNoteRecords(NoteListModel noteListModel)
@@ -147,7 +156,7 @@ namespace PermafnotesRepositoryByFile
                 this._noteRecords = new List<NoteListModel>();
             }
 
-            var result = this._noteRecords.ToList();
+            var result = this._noteRecords.Where(x => x.Created != noteListModel.Created).ToList();
             result.Add(noteListModel);
             this._noteRecords = result;
         }

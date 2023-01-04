@@ -20,6 +20,8 @@ public class NoteFormModel
     [Required(ErrorMessage = "Reference is required")]
     public string Reference { get; set; } = string.Empty;
 
+    public DateTime Created { get; set; } = DateTime.MinValue;
+
     public override string ToString()
         => $"{Title}, {Source}, {Memo}, {ConvertTagsToString()}, {Reference}";
 

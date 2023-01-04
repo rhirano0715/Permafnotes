@@ -27,14 +27,31 @@ public record NoteListModel
         this.Memo = noteFormModel.Memo;
         this.Tags = noteFormModel.ConvertTagsToString();
         this.Reference = noteFormModel.Reference;
-        this.Created = DateTime.Now;
+        if (noteFormModel.Created == DateTime.MinValue)
+        {
+            this.Created = DateTime.Now;
+        }
+        else
+        {
+            this.Created = noteFormModel.Created;
+        }
     }
-
-    //public override string ToString()
-    //    => $"{Title}, {Source}, {Memo}, {Tags}, {Reference}, {Created}";
 
     public IEnumerable<NoteTagModel> SplitTags()
     {
         return s_regexTagDelimiter.Split(Tags).Select(x => new NoteTagModel(x.Trim()));
+    }
+
+    public NoteFormModel ToNoteFormModel()
+    {
+        return new NoteFormModel()
+        { 
+            Title = this.Title,
+            Source = this.Source,
+            Memo = this.Memo,
+            Tags = s_regexTagDelimiter.Split(this.Tags).Select(x => x.Trim()).ToList(),
+            Reference = this.Reference,
+            Created = this.Created,
+    };
     }
 }
