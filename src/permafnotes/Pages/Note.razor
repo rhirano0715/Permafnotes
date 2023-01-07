@@ -22,7 +22,7 @@
     <Title>Note</Title>
     <Form Model="@_noteFormModel" OnFinish="OnFinish" OnFinishFailed="OnFinishFailed">
         <FormItem Label="Title">
-            <Input @bind-Value="@context.Title" ReadOnly/>
+            <Input @bind-Value="@context.Title" ReadOnly="@Editable"/>
         </FormItem>
         <FormItem Label="Tags">
             <Select Mode="tags"
@@ -44,10 +44,10 @@
             <Input @bind-Value="@context.Reference" />
         </FormItem>
         <FormItem Label="Source">
-            <TextArea @bind-Value="@context.Source" MinRows="@_minRows" ReadOnly/>
+            <TextArea @bind-Value="@context.Source" MinRows="@_minRows" ReadOnly="@Editable" />
         </FormItem>
         <FormItem Label="Memo">
-            <TextArea @bind-Value="@context.Memo" MinRows="@_minRows" ReadOnly/>
+            <TextArea @bind-Value="@context.Memo" MinRows="@_minRows" ReadOnly="@Editable" />
         </FormItem>
         <FormItem>
             <Button Type="@ButtonType.Primary" HtmlType="submit">Submit</Button>
@@ -83,7 +83,7 @@
         <SpaceItem>
             <Button Type="@ButtonType.Primary" OnClick="ClearListSelection">Clear selection</Button>
         </SpaceItem>
-        @if(_selectedRows.Count() == 1)
+        @if(Editable)
         {
             <SpaceItem>
                 <Button Type="@ButtonType.Primary" OnClick="StartEdit">StartEdit</Button>
@@ -122,6 +122,14 @@
 @code {
     [Inject]
     private ILogger<Note> logger { get; set; }
+    public IEnumerable<NoteListModel> NoteRecords { get; set; } = new List<NoteListModel>();
+    private bool Editable
+    {
+        get
+        {
+            return (_selectedRows.Count() == 1);
+        }
+    }
 
     ITable? _list;
 
@@ -132,7 +140,6 @@
     private IEnumerable<NoteTagModel> Tags = new List<NoteTagModel>();
 
     private List<string> ToolbarItems = new List<string>() { "Search" };
-    public IEnumerable<NoteListModel> NoteRecords { get; set; } = new List<NoteListModel>();
 
     private IEnumerable<NoteListModel> _selectedRows = new List<NoteListModel>();
     private IEnumerable<IBrowserFile> _choosenFiles = new List<IBrowserFile>();
