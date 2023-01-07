@@ -11,10 +11,19 @@
 
 <Title>Note editor</Title>
 
-<Form Model="@NoteFormModel" OnFinish="OnFinish" OnFinishFailed="OnFinishFailed">
-    <FormItem Label="Title">
-        <Input @bind-Value="@context.Title" ReadOnly="@ReadOnly" />
-    </FormItem>
+<Form Model="@NoteFormModel" OnFinish="OnFinish" OnFinishFailed="OnFinishFailed" >
+    <Space Direction="DirectionVHType.Horizontal" Style="width:100%">
+        <SpaceItem Style="width:50%">
+            <FormItem Label="Title">
+                <Input @bind-Value="@context.Title" ReadOnly="@ReadOnly" />
+            </FormItem>
+        </SpaceItem>
+        <SpaceItem Style="width:50%">
+            <FormItem Label="Reference">
+                <Input @bind-Value="@context.Reference" />
+            </FormItem>
+        </SpaceItem>
+    </Space>
     <FormItem Label="Tags">
         <Select Mode="tags"
                 @bind-Values="@context.Tags"
@@ -31,15 +40,18 @@
             </SelectOptions>
         </Select>
     </FormItem>
-    <FormItem Label="Reference">
-        <Input @bind-Value="@context.Reference" />
-    </FormItem>
-    <FormItem Label="Source">
-        <TextArea @bind-Value="@context.Source" MinRows="@_minRows" ReadOnly="@ReadOnly" />
-    </FormItem>
-    <FormItem Label="Memo">
-        <TextArea @bind-Value="@context.Memo" MinRows="@_minRows" ReadOnly="@ReadOnly" />
-    </FormItem>
+    <Space Direction="DirectionVHType.Horizontal" Style="width:100%">
+        <SpaceItem Style="width:50%">
+            <FormItem Label="Source">
+                <TextArea @bind-Value="@context.Source" MinRows="@_minRows" ReadOnly="@ReadOnly" />
+            </FormItem>
+        </SpaceItem>
+        <SpaceItem Style="width:50%">
+            <FormItem Label="Memo">
+                <TextArea @bind-Value="@context.Memo" MinRows="@_minRows" ReadOnly="@ReadOnly" />
+            </FormItem>
+        </SpaceItem>
+    </Space>
     <FormItem>
         <Button Type="@ButtonType.Primary" HtmlType="submit">Submit</Button>
         <Button Type="@ButtonType.Primary" OnClick="Clear">Clear</Button>

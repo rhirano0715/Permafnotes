@@ -20,24 +20,29 @@
 
 @inject NoteService NoteService
 
+
+
 <div class="note_form">
     <Editor NoteFormModel="@_noteFormModel" />
 </div>
 
 
 <div class="import_export">
-    <Title>Import / Export</Title>
-    <Space>
-        <SpaceItem>
-            <InputFile OnChange="@ChooseFiles" multiple />
-        </SpaceItem>
-        <SpaceItem>
-            <Button Type="@ButtonType.Primary" OnClick="Import" Danger>Import</Button>
-        </SpaceItem>
-        <SpaceItem>
-            <Button Type="@ButtonType.Primary" OnClick="Export">Export</Button>
-        </SpaceItem>
-    </Space>
+    <Checkbox @bind-Checked="_needToDisplayImportExport">Import/Export</Checkbox>
+    @if(_needToDisplayImportExport)
+    {
+        <Space>
+            <SpaceItem>
+                <InputFile OnChange="@ChooseFiles" multiple />
+            </SpaceItem>
+            <SpaceItem>
+                <Button Type="@ButtonType.Primary" OnClick="Import" Danger>Import</Button>
+            </SpaceItem>
+            <SpaceItem>
+                <Button Type="@ButtonType.Primary" OnClick="Export">Export</Button>
+            </SpaceItem>
+        </Space>
+    }
 </div>
 
 <br />
@@ -63,9 +68,9 @@
 
 <br />
 
-<Table @ref="_list" TItem="NoteListModel" DataSource="@NoteRecords" Size="TableSize.Middle" @bind-SelectedRows="_selectedRows" >
-    <Selection Key="@context.Created.ToString()" Type="radio" />
-    <Column @bind-Field="context.Title"  TData="string" Sortable Filterable Width="10%" />
+<Table @ref="_list" TItem="NoteListModel" DataSource="@NoteRecords" Size="TableSize.Middle" @bind-SelectedRows="_selectedRows" Style="width:100%" >
+    <Selection Key="@context.Created.ToString()" Type="radio" Width="2%" />
+    <Column @bind-Field="context.Title"  TData="string" Sortable Filterable Width="15%" />
     <Column @bind-Field="context.Source" TData="string" Sortable Filterable Width="30%" />
     <Column @bind-Field="context.Memo" TData="string" Sortable Filterable Width="30%" />
     <Column Title="Tags" TData="string" Sortable Filterable Width="10%">
@@ -74,7 +79,7 @@
             <Tag Color="green">@(string.IsNullOrEmpty(tag.Name) ? string.Empty : tag.Name)</Tag>
         }
     </Column>
-    <Column Title="Reference"            TData="string"   Sortable Filterable Width="10%" >
+    <Column Title="Reference"            TData="string"   Sortable Filterable Width="5%" >
         @if (context.Reference.StartsWith("http://") || context.Reference.StartsWith("https://"))
         {
             <a href="@context.Reference">@context.Reference</a>
@@ -84,7 +89,7 @@
             @context.Reference
         }
     </Column>
-    <Column @bind-Field="context.Created" TData="DateTime" Sortable Filterable Width="10%" />
+    <Column @bind-Field="context.Created" TData="DateTime" Sortable Filterable Width="8%" />
 </Table>
 
 @code {
@@ -101,6 +106,7 @@
 
     private NoteFormModel _noteFormModel = new();
 
+    private bool _needToDisplayImportExport = false;
     private IEnumerable<IBrowserFile> _choosenFiles = new List<IBrowserFile>();
 
     ITable? _list;
