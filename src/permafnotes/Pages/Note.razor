@@ -51,7 +51,7 @@
         </FormItem>
         <FormItem>
             <Button Type="@ButtonType.Primary" HtmlType="submit">Submit</Button>
-            <Button Type="@ButtonType.Primary" OnClick="ClearForm">Clear</Button>
+            <Button Type="@ButtonType.Primary" OnClick="Clear">Clear</Button>
         </FormItem>
     </Form>
 </div>
@@ -81,7 +81,7 @@
             <Button Type="@ButtonType.Primary" OnClick="Refresh">Reflesh</Button>
         </SpaceItem>
         <SpaceItem>
-            <Button Type="@ButtonType.Primary" OnClick="ClearListSelection">Clear selection</Button>
+            <Button Type="@ButtonType.Primary" OnClick="Clear">Clear</Button>
         </SpaceItem>
         @if(Editable)
         {
@@ -183,15 +183,17 @@
     }
 
     private void ClearForm()
-        => this._noteFormModel = new()
-            {
-                Title = this._noteFormModel.Title,
-                Source = string.Empty,
-                Memo = string.Empty,
-                Tags = this._noteFormModel.Tags,
-                Reference = string.Empty,
-                Created = DateTime.MinValue
-            };
+    {
+        this._noteFormModel = new()
+           {
+               Title = this._noteFormModel.Title,
+               Source = string.Empty,
+               Memo = string.Empty,
+               Tags = this._noteFormModel.Tags,
+               Reference = string.Empty,
+               Created = DateTime.MinValue
+           };
+    }
 
     private void ChooseFiles(InputFileChangeEventArgs e)
         => _choosenFiles = e.GetMultipleFiles();
@@ -233,6 +235,11 @@
     {
         if (_list is not null)
             _list.SetSelection(null);
+    }
+
+    private void Clear()
+    {
+        ClearListSelection();
         ClearForm();
     }
 
