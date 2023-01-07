@@ -14,46 +14,14 @@
 @using PermafnotesDomain.Models
 @using PermafnotesDomain.Services
 
+@using permafnotes.Components
+
 @attribute [Authorize]
 
 @inject NoteService NoteService
 
 <div class="note_form">
-    <Title>Note</Title>
-    <Form Model="@_noteFormModel" OnFinish="OnFinish" OnFinishFailed="OnFinishFailed">
-        <FormItem Label="Title">
-            <Input @bind-Value="@context.Title" ReadOnly="@Editable"/>
-        </FormItem>
-        <FormItem Label="Tags">
-            <Select Mode="tags"
-                    @bind-Values="@context.Tags"
-                    Placeholder="Please select"
-                    TItemValue="string"
-                    TItem="string"
-                    Size="@_sizeValue"
-                    OnSelectedItemsChanged="OnSelectedItemsChangedHandler">
-                <SelectOptions>
-                    @foreach (var tag in Tags)
-                    {
-                        <SelectOption TItemValue="string" TItem="string" Value=@tag.Name Label=@tag.Name />
-                    }
-                </SelectOptions>
-            </Select>
-        </FormItem>
-        <FormItem Label="Reference">
-            <Input @bind-Value="@context.Reference" />
-        </FormItem>
-        <FormItem Label="Source">
-            <TextArea @bind-Value="@context.Source" MinRows="@_minRows" ReadOnly="@Editable" />
-        </FormItem>
-        <FormItem Label="Memo">
-            <TextArea @bind-Value="@context.Memo" MinRows="@_minRows" ReadOnly="@Editable" />
-        </FormItem>
-        <FormItem>
-            <Button Type="@ButtonType.Primary" HtmlType="submit">Submit</Button>
-            <Button Type="@ButtonType.Primary" OnClick="Clear">Clear</Button>
-        </FormItem>
-    </Form>
+    <Editor NoteFormModel="@_noteFormModel" />
 </div>
 
 
@@ -80,11 +48,11 @@
         <SpaceItem>
             <Button Type="@ButtonType.Primary" OnClick="Refresh">Reflesh</Button>
         </SpaceItem>
-        <SpaceItem>
-            <Button Type="@ButtonType.Primary" OnClick="Clear">Clear</Button>
-        </SpaceItem>
-        @if(Editable)
+        @if(Selected)
         {
+            <SpaceItem>
+                <Button Type="@ButtonType.Primary" OnClick="ClearListSelection">Clear</Button>
+            </SpaceItem>
             <SpaceItem>
                 <Button Type="@ButtonType.Primary" OnClick="StartEdit">StartEdit</Button>
             </SpaceItem>
@@ -123,7 +91,7 @@
     [Inject]
     private ILogger<Note> logger { get; set; }
     public IEnumerable<NoteListModel> NoteRecords { get; set; } = new List<NoteListModel>();
-    private bool Editable
+    private bool Selected
     {
         get
         {
@@ -131,19 +99,13 @@
         }
     }
 
-    ITable? _list;
-
-    private string _sizeValue = AntSizeLDSType.Default;
-    private uint _minRows = 4;
-
     private NoteFormModel _noteFormModel = new();
-    private IEnumerable<NoteTagModel> Tags = new List<NoteTagModel>();
 
-    private List<string> ToolbarItems = new List<string>() { "Search" };
-
-    private IEnumerable<NoteListModel> _selectedRows = new List<NoteListModel>();
     private IEnumerable<IBrowserFile> _choosenFiles = new List<IBrowserFile>();
 
+    ITable? _list;
+    private List<string> ToolbarItems = new List<string>() { "Search" };
+    private IEnumerable<NoteListModel> _selectedRows = new List<NoteListModel>();
     private Timer _refleshers;
 
     protected override async Task OnInitializedAsync()
@@ -160,39 +122,6 @@
         }, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
 
         await base.OnInitializedAsync();
-    }
-
-    private async Task OnFinish(EditContext editContext)
-    {
-        await Add();
-        logger.LogDebug($"Success:{_noteFormModel.ToString()}");
-    }
-
-    private void OnFinishFailed(EditContext editContext)
-    {
-        logger.LogError($"Failed:{_noteFormModel.ToString()}");
-    }
-
-    private async Task Add()
-    {
-        NoteRecords = await NoteService.Add(_noteFormModel);
-
-        Tags = NoteService.SelectAllTags();
-
-        this.ClearForm();
-    }
-
-    private void ClearForm()
-    {
-        this._noteFormModel = new()
-           {
-               Title = this._noteFormModel.Title,
-               Source = string.Empty,
-               Memo = string.Empty,
-               Tags = this._noteFormModel.Tags,
-               Reference = string.Empty,
-               Created = DateTime.MinValue
-           };
     }
 
     private void ChooseFiles(InputFileChangeEventArgs e)
@@ -219,7 +148,6 @@
     private async Task RefreshList(bool onlyCache = false)
     {
         NoteRecords = await NoteService.FetchAll(onlyCache);
-        Tags = NoteService.SelectAllTags();
     }
 
     private void StartEdit()
@@ -229,6 +157,7 @@
             return;
         }
         _noteFormModel = _selectedRows.First().ToNoteFormModel();
+        ClearListSelection();
     }
 
     private void ClearListSelection()
@@ -237,27 +166,9 @@
             _list.SetSelection(null);
     }
 
-    private void Clear()
-    {
-        ClearListSelection();
-        ClearForm();
-    }
-
     private void OnRowClick(RowData<NoteListModel> row)
     {
         logger.LogDebug($"current row: ${row.Data.ToString()}");
     }
-
-    private void OnSelectedItemChangedHandler(string value)
-    {
-        logger.LogDebug($"selected: ${value}");
-    }
-
-    private void OnSelectedItemsChangedHandler(IEnumerable<string> values)
-    {
-        if (values != null)
-            logger.LogDebug($"selected: ${string.Join(",", values)}");
-    }
-
 }
 

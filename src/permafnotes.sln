@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PermafnotesDomain", "Permaf
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PermafnotesRepositoryByFile", "PermafnotesRepositoryByFile\PermafnotesRepositoryByFile.csproj", "{B848B77E-97B2-4242-8395-014873EFF3D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PermafnotesRepositoryByFileTest", "PermafnotesRepositoryByFileTest\PermafnotesRepositoryByFileTest.csproj", "{FE1C89D4-3435-4169-8421-267015685E68}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PermafnotesRepositoryByFileTest", "PermafnotesRepositoryByFileTest\PermafnotesRepositoryByFileTest.csproj", "{FE1C89D4-3435-4169-8421-267015685E68}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

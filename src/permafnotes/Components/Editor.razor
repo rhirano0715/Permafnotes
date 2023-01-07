@@ -1,0 +1,109 @@
+﻿@using System.ComponentModel
+@using System.ComponentModel.DataAnnotations
+
+@using AntDesign
+@using AntDesign.TableModels
+
+@using PermafnotesDomain.Models
+@using PermafnotesDomain.Services
+
+@inject NoteService NoteService
+
+<Title>Note editor</Title>
+
+<Form Model="@NoteFormModel" OnFinish="OnFinish" OnFinishFailed="OnFinishFailed">
+    <FormItem Label="Title">
+        <Input @bind-Value="@context.Title" ReadOnly="@ReadOnly" />
+    </FormItem>
+    <FormItem Label="Tags">
+        <Select Mode="tags"
+                @bind-Values="@context.Tags"
+                Placeholder="Please select"
+                TItemValue="string"
+                TItem="string"
+                Size="@_sizeValue"
+                OnSelectedItemsChanged="OnSelectedItemsChangedHandler">
+            <SelectOptions>
+                @foreach (var tag in Tags)
+                {
+                    <SelectOption TItemValue="string" TItem="string" Value=@tag.Name Label=@tag.Name />
+                }
+            </SelectOptions>
+        </Select>
+    </FormItem>
+    <FormItem Label="Reference">
+        <Input @bind-Value="@context.Reference" />
+    </FormItem>
+    <FormItem Label="Source">
+        <TextArea @bind-Value="@context.Source" MinRows="@_minRows" ReadOnly="@ReadOnly" />
+    </FormItem>
+    <FormItem Label="Memo">
+        <TextArea @bind-Value="@context.Memo" MinRows="@_minRows" ReadOnly="@ReadOnly" />
+    </FormItem>
+    <FormItem>
+        <Button Type="@ButtonType.Primary" HtmlType="submit">Submit</Button>
+        <Button Type="@ButtonType.Primary" OnClick="Clear">Clear</Button>
+    </FormItem>
+</Form>
+
+
+@code {
+    [Inject]
+    private ILogger<permafnotes.Pages.Note> logger { get; set; }
+
+    [Parameter]
+    public NoteFormModel NoteFormModel { get; set; } = new();
+
+    public IEnumerable<NoteTagModel> Tags { get; set; } = new List<NoteTagModel>();
+
+    private bool ReadOnly
+    {
+        get 
+        {
+            return (NoteFormModel.Created != DateTime.MinValue);
+        }
+    }
+
+    private string _sizeValue = AntSizeLDSType.Default;
+    private uint _minRows = 4;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Tags = NoteService.SelectAllTags();
+    }
+
+    private async Task OnFinish(EditContext editContext)
+    {
+        await Add();
+        logger.LogDebug($"Success:{NoteFormModel.ToString()}");
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        logger.LogError($"Failed:{NoteFormModel.ToString()}");
+    }
+
+    private async Task Add()
+    {
+        await NoteService.Add(NoteFormModel);
+
+        Tags = NoteService.SelectAllTags();
+
+        this.Clear();
+    }
+
+    private void OnSelectedItemsChangedHandler(IEnumerable<string> values)
+    {
+        if (values != null)
+            logger.LogDebug($"selected: ${string.Join(",", values)}");
+    }
+
+    private void Clear()
+    {
+        this.NoteFormModel.Source = string.Empty;
+        this.NoteFormModel.Memo = string.Empty;
+        this.NoteFormModel.Reference = string.Empty;
+        this.NoteFormModel.Created = DateTime.MinValue;
+    }
+}
