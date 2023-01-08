@@ -82,20 +82,20 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        Tags = NoteService.SelectAllTags();
+        this.UpdateTag();
     }
 
     private async Task OnFinish(EditContext editContext)
     {
         await Add();
-        Tags = NoteService.SelectAllTags();
+        this.UpdateTag();
         this.Clear();
         logger.LogDebug($"Success:{NoteFormModel.ToString()}");
     }
 
     private void OnFinishFailed(EditContext editContext)
     {
-        Tags = NoteService.SelectAllTags();
+        this.UpdateTag();
         this.Clear();
         logger.LogError($"Failed:{NoteFormModel.ToString()}");
     }
@@ -118,5 +118,12 @@
         this.NoteFormModel.Memo = string.Empty;
         this.NoteFormModel.Reference = string.Empty;
         this.NoteFormModel.Created = DateTime.MinValue;
+        StateHasChanged();
+    }
+
+    private void UpdateTag()
+    {
+        Tags = NoteService.SelectAllTags();
+        StateHasChanged();
     }
 }
