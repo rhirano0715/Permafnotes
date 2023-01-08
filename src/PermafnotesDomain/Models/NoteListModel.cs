@@ -39,7 +39,10 @@ public record NoteListModel
 
     public IEnumerable<NoteTagModel> SplitTags()
     {
-        return s_regexTagDelimiter.Split(Tags).Select(x => new NoteTagModel(x.Trim()));
+        return s_regexTagDelimiter.Split(Tags)
+            .Select(x => new NoteTagModel(x.Trim()))
+            .Where(x => !string.IsNullOrWhiteSpace(x.Name))
+            ;
     }
 
     public NoteFormModel ToNoteFormModel()
