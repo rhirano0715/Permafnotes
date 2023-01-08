@@ -40,7 +40,7 @@
             </SelectOptions>
         </Select>
     </FormItem>
-    <Space Direction="DirectionVHType.Horizontal" Style="width:100%">
+    <Space Direction="DirectionVHType.Horizontal" Align="baseline" Style="width:100%">
         <SpaceItem Style="width:50%">
             <FormItem Label="Source">
                 <TextArea @bind-Value="@context.Source" MinRows="@_minRows" ReadOnly="@ReadOnly" />
@@ -88,11 +88,15 @@
     private async Task OnFinish(EditContext editContext)
     {
         await Add();
+        Tags = NoteService.SelectAllTags();
+        this.Clear();
         logger.LogDebug($"Success:{NoteFormModel.ToString()}");
     }
 
     private void OnFinishFailed(EditContext editContext)
     {
+        Tags = NoteService.SelectAllTags();
+        this.Clear();
         logger.LogError($"Failed:{NoteFormModel.ToString()}");
     }
 
@@ -100,9 +104,6 @@
     {
         await NoteService.Add(NoteFormModel);
 
-        Tags = NoteService.SelectAllTags();
-
-        this.Clear();
     }
 
     private void OnSelectedItemsChangedHandler(IEnumerable<string> values)
