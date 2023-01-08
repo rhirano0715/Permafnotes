@@ -213,7 +213,7 @@ namespace PermafnotesRepositoryByFile
             await repository.FetchAll();
 
             // Act
-            var actual = repository.SelectAllTags();
+            var actual = await repository.SelectAllTags();
 
             // Assert
             IEnumerable<NoteTagModel> expected = new List<NoteTagModel>()

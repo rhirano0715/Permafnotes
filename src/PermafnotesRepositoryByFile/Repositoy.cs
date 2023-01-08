@@ -105,9 +105,13 @@ namespace PermafnotesRepositoryByFile
             }
         }
 
-        public IEnumerable<NoteTagModel> SelectAllTags()
+        public async Task<IEnumerable<NoteTagModel>> SelectAllTags()
         {
             List<NoteTagModel> result = new();
+            if (this._noteRecords.Count() <= 0)
+            {
+                await this.FetchAll(onlyCache: true);
+            }
             foreach (var m in this._noteRecords)
             {
                 foreach (var t in m.SplitTags())

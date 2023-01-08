@@ -82,20 +82,20 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        this.UpdateTag();
+        await this.UpdateTag();
     }
 
     private async Task OnFinish(EditContext editContext)
     {
         await Add();
-        this.UpdateTag();
+        await this.UpdateTag();
         this.Clear();
         logger.LogDebug($"Success:{NoteFormModel.ToString()}");
     }
 
-    private void OnFinishFailed(EditContext editContext)
+    private async Task OnFinishFailed(EditContext editContext)
     {
-        this.UpdateTag();
+        await this.UpdateTag();
         this.Clear();
         logger.LogError($"Failed:{NoteFormModel.ToString()}");
     }
@@ -121,9 +121,9 @@
         StateHasChanged();
     }
 
-    private void UpdateTag()
+    private async Task UpdateTag()
     {
-        Tags = NoteService.SelectAllTags();
+        Tags = await NoteService.SelectAllTags();
         StateHasChanged();
     }
 }
