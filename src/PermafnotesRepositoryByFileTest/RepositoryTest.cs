@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Graph.SecurityNamespace;
 using Newtonsoft.Json.Serialization;
 using PermafnotesDomain.Models;
 using System;
@@ -39,6 +40,60 @@ namespace PermafnotesRepositoryByFile
 
         private FileInfo CreateNoteFileInfo(DirectoryInfo directoryInfo, string noteFileName)
             => new(Path.Combine(directoryInfo.ToString(), noteFileName));
+
+        public class SelectAllTagsTest
+        {
+            [Test]
+            public async Task WhenAlreadyLoadedNotes()
+            {
+                // Arrange
+                MockLogger logger = new MockLogger();
+
+                DirectoryInfo baseDir = new(Path.Combine(s_baseDirectoryPath, "SelectAllTagsTest/WhenAlreadyLoadedNotes"));
+                DirectoryInfo inputAndActualDir = new(Path.Combine(baseDir.ToString(), "InputAndActual"));
+                FileInfo cachePath = new(Path.Combine(inputAndActualDir.ToString(), "cache.json"));
+                if (cachePath.Exists)
+                    cachePath.Delete();
+
+                Repositoy repository = Repositoy.CreateRepositoryUsingFileSystem(logger, inputAndActualDir.ToString());
+                await repository.FetchAll();
+
+                // Act
+                var actual = await repository.SelectAllTags();
+
+                // Assert
+                IEnumerable<NoteTagModel> expected = new List<NoteTagModel>()
+                {
+                    new NoteTagModel("Tag1")
+                };
+
+                Assert.That(actual, Is.EqualTo(expected), "SelectAllTags's return don't match the expected");
+            }
+
+            [Test]
+            public async Task WhenNotAlreadyLoadedNotesLoadNotesFromCacheBeforeSelectAllTags()
+            {
+                // Arrange
+                MockLogger logger = new MockLogger();
+
+                DirectoryInfo baseDir = new(Path.Combine(s_baseDirectoryPath, "SelectAllTagsTest/WhenNotAlreadyLoadedNotesLoadNotesFromCacheBeforeSelectAllTags"));
+                DirectoryInfo inputAndActualDir = new(Path.Combine(baseDir.ToString(), "InputAndActual"));
+                FileInfo cachePath = new(Path.Combine(inputAndActualDir.ToString(), "cache.json"));
+
+                Repositoy repository = Repositoy.CreateRepositoryUsingFileSystem(logger, inputAndActualDir.ToString());
+
+                // Act
+                var actual = await repository.SelectAllTags();
+
+                // Assert
+                IEnumerable<NoteTagModel> expected = new List<NoteTagModel>()
+                {
+                    new NoteTagModel("Tag1")
+                };
+
+                Assert.That(actual, Is.EqualTo(expected), "SelectAllTags's return don't match the expected");
+            }
+        }
 
         public class FetchAllTest
         {
@@ -197,31 +252,5 @@ namespace PermafnotesRepositoryByFile
             FileAssert.AreEqual(CreateNoteFileInfo(expectedDir, expectedNoteFileName), CreateNoteFileInfo(actualDir, expectedNoteFileName));
         }
 
-        [Test]
-        public async Task SelectAllTagsTest()
-        {
-            // Arrange
-            MockLogger logger = new MockLogger();
-
-            DirectoryInfo baseDir = new(Path.Combine(s_baseDirectoryPath, "SelectAllTagsTest"));
-            DirectoryInfo inputAndActualDir = new(Path.Combine(baseDir.ToString(), "InputAndActual"));
-            FileInfo cachePath = new(Path.Combine(inputAndActualDir.ToString(), "cache.json"));
-            if (cachePath.Exists)
-                cachePath.Delete();
-
-            Repositoy repository = Repositoy.CreateRepositoryUsingFileSystem(logger, inputAndActualDir.ToString());
-            await repository.FetchAll();
-
-            // Act
-            var actual = await repository.SelectAllTags();
-
-            // Assert
-            IEnumerable<NoteTagModel> expected = new List<NoteTagModel>()
-            {
-                new NoteTagModel("Tag1")
-            };
-
-            Assert.That(actual, Is.EqualTo(expected), "SelectAllTags's return don't match the expected");
-        }
     }
 }
