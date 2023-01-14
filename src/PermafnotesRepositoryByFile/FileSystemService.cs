@@ -19,36 +19,12 @@ namespace PermafnotesRepositoryByFile
         private FileInfo _cache;
         private DirectoryInfo _noteDirectory;
 
-        private FileInfo Cache
-        {
-            get
-            {
-                if (this._cache == null)
-                {
-                    this._cache = new FileInfo(Path.Combine(_baseDirectory.FullName, s_cacheName));
-                }
-
-                return this._cache;
-            }
-        }
-
-        private DirectoryInfo NoteDirectory
-        {
-            get
-            {
-                if (this._noteDirectory == null)
-                {
-                    this._noteDirectory = new DirectoryInfo(Path.Combine(_baseDirectory.FullName, "notes"));
-                }
-
-                return this._noteDirectory;
-            }
-        }
-
         internal FileSystemService(ILogger logger, string baseDirectoryPathFromRoot)
         {
             this._logger = logger;
             this._baseDirectory = new(baseDirectoryPathFromRoot);
+            this._noteDirectory = new DirectoryInfo(Path.Combine(_baseDirectory.FullName, "notes"));
+            this._cache = new FileInfo(Path.Combine(_baseDirectory.FullName, s_cacheName));
 
             // TODO: Validate
         }
@@ -59,37 +35,43 @@ namespace PermafnotesRepositoryByFile
         }
 
         public async Task<IEnumerable<PermafnotesNoteFile>> FetchChildren()
-            => this.NoteDirectory.GetFiles()
+        {
+            await Task.Delay(1);
+            return this._noteDirectory.GetFiles()
                 .Select(x => new PermafnotesNoteFile(x.Name))
                 .ToList();
+        }
 
         public async Task<string> ReadCache()
         {
-            if (!this.Cache.Exists)
+            if (!this._cache.Exists)
             {
                 await Task.CompletedTask;
                 return string.Empty;
             }
 
-            return ReadFileAsString(this.Cache.FullName);
+            return ReadFileAsString(this._cache.FullName);
         }
 
         public async Task<string> ReadNote(string name)
         {
-            return this.ReadFileAsString(Path.Combine(this.NoteDirectory.FullName, name));
+            await Task.Delay(1);
+            return this.ReadFileAsString(Path.Combine(this._noteDirectory.FullName, name));
         }
 
         public async Task WriteCache(string text)
         {
-            using var writer = new StreamWriter(this.Cache.FullName, append: false, encoding: s_encoding);
+            await Task.Delay(1);
+            using var writer = new StreamWriter(this._cache.FullName, append: false, encoding: s_encoding);
             writer.Write(text);
         }
 
         public async Task WriteNote(string fileName, string text)
         {
-            if (!this.NoteDirectory.Exists)
-                this.NoteDirectory.Create();
-            FileInfo outputFile = new (Path.Combine(this.NoteDirectory.ToString(), fileName));
+            await Task.Delay(1);
+            if (!this._noteDirectory.Exists)
+                this._noteDirectory.Create();
+            FileInfo outputFile = new (Path.Combine(this._noteDirectory.ToString(), fileName));
             using var writer = new StreamWriter(outputFile.ToString(), append: false, encoding: s_encoding);
             writer.Write(text);
         }
