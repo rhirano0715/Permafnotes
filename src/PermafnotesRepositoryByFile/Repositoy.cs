@@ -8,6 +8,7 @@ using CsvHelper;
 
 using PermafnotesDomain.Models;
 using PermafnotesDomain.Services;
+using AntDesign;
 
 namespace PermafnotesRepositoryByFile
 {
@@ -15,6 +16,7 @@ namespace PermafnotesRepositoryByFile
     {
         private static string s_noteFileDateTimeFormat = "yyyyMMddHHmmssfffffff";
         private static Encoding s_encoding = Encoding.GetEncoding("UTF-8");
+        private static string s_lineFormat = "\"{0}\"\t\"{1}\"\t\"{2}\"\t\"{3}\"\t\"{4}\"\t\"{5}\"\n";
 
         private IFileService _fileService;
         private ILogger _logger;
@@ -81,12 +83,11 @@ namespace PermafnotesRepositoryByFile
 
         public async Task Export(IEnumerable<NoteListModel> records)
         {
-            string lineFormat = "\"{0}\"\t\"{1}\"\t\"{2}\"\t\"{3}\"\t\"{4}\"\t\"{5}\"\n";
-            StringBuilder sb = new(string.Format(lineFormat, "Title", "Source", "Memo", "Tags", "Reference", "Created"));
-            foreach (var record in records)
-            {
-                sb.Append(string.Format(lineFormat, record.Title, record.Source, record.Memo, record.Tags, record.Reference, record.Created));
-            }
+            // TODO: 
+            StringBuilder sb = new(string.Format(s_lineFormat, "Title", "Source", "Memo", "Tags", "Reference", "Created"));
+            records.ForEach(x => 
+                sb.Append(string.Format(s_lineFormat, x.Title, x.Source, x.Memo, x.Tags, x.Reference, x.Created))
+            );
 
             string uploadName = $"{DateTime.Now.ToString(s_noteFileDateTimeFormat)}.tsv";
 

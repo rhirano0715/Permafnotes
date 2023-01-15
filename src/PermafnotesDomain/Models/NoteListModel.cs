@@ -55,6 +55,6 @@ public record NoteListModel
             Tags = s_regexTagDelimiter.Split(this.Tags).Select(x => x.Trim()).ToList(),
             Reference = this.Reference,
             Created = this.Created,
-    };
+        };
     }
 }
