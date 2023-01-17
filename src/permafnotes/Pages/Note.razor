@@ -71,8 +71,14 @@
 <Table @ref="_list" TItem="NoteListModel" DataSource="@NoteRecords" Size="TableSize.Middle" @bind-SelectedRows="_selectedRows" Style="width:100%" >
     <Selection Key="@context.Created.ToString()" Type="radio" Width="2%" />
     <Column @bind-Field="context.Title"  TData="string" Sortable Filterable Width="15%" />
-    <Column @bind-Field="context.Source" TData="string" Sortable Filterable Width="30%" />
-    <Column @bind-Field="context.Memo" TData="string" Sortable Filterable Width="30%" />
+    <Column Title="Source" TData="string" Sortable Filterable Width="30%" >
+        @* TODO: Markdown rendaring *@
+        @((MarkupString)context.Source.Replace("\n", "<br />"))
+    </Column>
+    <Column Title="Memo" TData="string" Sortable Filterable Width="30%" >
+        @* TODO: Markdown rendaring *@
+        @((MarkupString)context.Memo.Replace("\n", "<br />"))
+    </Column>
     <Column Title="Tags" TData="string" Sortable Filterable Width="10%">
         @foreach (var tag in context.SplitTags())
         {
