@@ -5,6 +5,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using PermafnotesDomain.Extensions;
+
 public record NoteListModel
 {
     private static Regex s_regexTagDelimiter = new(@",");
@@ -66,21 +68,19 @@ public record NoteListModel
     }
 
     public static string BuildCsvHeader(string delimiter)
-        => Join(delimiter, s_csvColumns);
+        => StringExtensions.Join(delimiter, s_csvColumns);
     
-    private static string Join(string delimiter, IEnumerable<string> values)
-        => string.Join(delimiter, values.Select(x => $"\"{x}\""));
 
     public string ToCsvLine(string delimiter)
-        => Join(
+        => StringExtensions.Join(
                 delimiter,
                 new string[] {
-                    this.Title,
-                    this.Source,
-                    this.Memo,
-                    this.Tags,
-                    this.Reference,
-                    this.Created.ToString()
+                    this.Title.EscapeDoubleQuote(),
+                    this.Source.EscapeDoubleQuote(),
+                    this.Memo.EscapeDoubleQuote(),
+                    this.Tags.EscapeDoubleQuote(),
+                    this.Reference.EscapeDoubleQuote(),
+                    this.Created.ToString().EscapeDoubleQuote()
                 }
             );
 }
