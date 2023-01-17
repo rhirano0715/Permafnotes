@@ -1,10 +1,17 @@
 ﻿namespace PermafnotesDomain.Models;
 
+using AntDesign;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 
 public record NoteListModel
 {
     private static Regex s_regexTagDelimiter = new(@",");
+    private static IEnumerable<string> s_csvColumns = new List<string>()
+    {
+        "Title", "Source", "Memo", "Tags", "Reference", "Created",
+    };
 
     public string Title { get; set; } = string.Empty;
 
@@ -57,4 +64,23 @@ public record NoteListModel
             Created = this.Created,
         };
     }
+
+    public static string BuildCsvHeader(string delimiter)
+        => Join(delimiter, s_csvColumns);
+    
+    private static string Join(string delimiter, IEnumerable<string> values)
+        => string.Join(delimiter, values.Select(x => $"\"{x}\""));
+
+    public string ToCsvLine(string delimiter)
+        => Join(
+                delimiter,
+                new string[] {
+                    this.Title,
+                    this.Source,
+                    this.Memo,
+                    this.Tags,
+                    this.Reference,
+                    this.Created.ToString()
+                }
+            );
 }

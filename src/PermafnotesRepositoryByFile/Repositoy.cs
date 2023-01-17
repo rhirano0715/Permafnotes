@@ -16,7 +16,6 @@ namespace PermafnotesRepositoryByFile
     {
         private static string s_noteFileDateTimeFormat = "yyyyMMddHHmmssfffffff";
         private static Encoding s_encoding = Encoding.GetEncoding("UTF-8");
-        private static string s_lineFormat = "\"{0}\"\t\"{1}\"\t\"{2}\"\t\"{3}\"\t\"{4}\"\t\"{5}\"\n";
 
         private IFileService _fileService;
         private ILogger _logger;
@@ -81,14 +80,11 @@ namespace PermafnotesRepositoryByFile
             return this.OrderByDescendingNoteRecords();
         }
 
-        public async Task Export(IEnumerable<NoteListModel> records)
+        public async Task Export(IEnumerable<NoteListModel> records, string delimiter="\t")
         {
-            // TODO: 
-            StringBuilder sb = new(string.Format(s_lineFormat, "Title", "Source", "Memo", "Tags", "Reference", "Created"));
-            records.ForEach(x => 
-                sb.Append(string.Format(s_lineFormat, x.Title, x.Source, x.Memo, x.Tags, x.Reference, x.Created))
-            );
-
+            StringBuilder sb = new(NoteListModel.BuildCsvHeader(delimiter));
+            sb.Append("\n");
+            records.ForEach(x => sb.Append(x.ToCsvLine(delimiter)).Append("\n"));
             string uploadName = $"{DateTime.Now.ToString(s_noteFileDateTimeFormat)}.tsv";
 
             await this._fileService.Export(uploadName, sb.ToString());
