@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PermafnotesRepositoryByFile
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PermafnotesRepositoryByFileTest", "PermafnotesRepositoryByFileTest\PermafnotesRepositoryByFileTest.csproj", "{FE1C89D4-3435-4169-8421-267015685E68}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PermafnotesDomainTest", "PermafnotesDomainTest\PermafnotesDomainTest.csproj", "{02983CF8-EEC2-4E31-9493-B4019E8057FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{FE1C89D4-3435-4169-8421-267015685E68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE1C89D4-3435-4169-8421-267015685E68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE1C89D4-3435-4169-8421-267015685E68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02983CF8-EEC2-4E31-9493-B4019E8057FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02983CF8-EEC2-4E31-9493-B4019E8057FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02983CF8-EEC2-4E31-9493-B4019E8057FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02983CF8-EEC2-4E31-9493-B4019E8057FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
