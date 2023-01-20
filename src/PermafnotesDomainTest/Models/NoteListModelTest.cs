@@ -1,3 +1,6 @@
+using AntDesign;
+using System.Diagnostics.Metrics;
+
 namespace PermafnotesDomain.Models
 {
     public class NoteListModelTest
@@ -31,6 +34,28 @@ namespace PermafnotesDomain.Models
                 IEnumerable<NoteTagModel> expected = new List<NoteTagModel>() {
                     new NoteTagModel("Tag01"),
                     new NoteTagModel("Tag02"),
+                };
+                Assert.That(model.SplitTags(), Is.EqualTo(expected));
+            }
+            [Test]
+            public void IgnoreEmptyElements()
+            {
+                NoteListModel model = new NoteListModel() { Tags = "Tag01, , Tag02" };
+                IEnumerable<NoteTagModel> expected = new List<NoteTagModel>() {
+                    new NoteTagModel("Tag01"),
+                    new NoteTagModel("Tag02"),
+                };
+                Assert.That(model.SplitTags(), Is.EqualTo(expected));
+            }
+            [Test]
+            public void DeleteSpacesBeforeAndAfterTag()
+            {
+                NoteListModel model = new NoteListModel() { Tags = " Tag01, Tag02,Tag03 , Tag04 " };
+                IEnumerable<NoteTagModel> expected = new List<NoteTagModel>() {
+                    new NoteTagModel("Tag01"),
+                    new NoteTagModel("Tag02"),
+                    new NoteTagModel("Tag03"),
+                    new NoteTagModel("Tag04"),
                 };
                 Assert.That(model.SplitTags(), Is.EqualTo(expected));
             }
