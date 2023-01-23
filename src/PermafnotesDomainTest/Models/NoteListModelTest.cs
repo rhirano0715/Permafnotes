@@ -10,6 +10,12 @@ namespace PermafnotesDomain.Models
         {
         }
 
+        [Test]
+        public void BuildCsvHeaderTest()
+        {
+            Assert.That(NoteListModel.BuildCsvHeader("\t"), Is.EqualTo("\"Title\"\t\"Source\"\t\"Memo\"\t\"Tags\"\t\"Reference\"\t\"Created\""));
+        }
+
         public class SplitTagsTest
         {
             [Test]
