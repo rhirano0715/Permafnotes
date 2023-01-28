@@ -1,8 +1,5 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.Graph.SecurityNamespace;
-using Newtonsoft.Json.Serialization;
 using PermafnotesDomain.Models;
-using System;
 
 namespace PermafnotesRepositoryByFile
 {

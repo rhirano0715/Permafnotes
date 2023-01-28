@@ -1,6 +1,3 @@
-using AntDesign;
-using System.Diagnostics.Metrics;
-
 namespace PermafnotesDomain.Models
 {
     public class NoteListModelTest

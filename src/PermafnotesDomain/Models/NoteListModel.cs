@@ -1,8 +1,4 @@
 ﻿namespace PermafnotesDomain.Models;
-
-using AntDesign;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
 
 using PermafnotesDomain.Extensions;
