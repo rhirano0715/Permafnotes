@@ -16,6 +16,22 @@ namespace PermafnotesDomain.Models
             Assert.That(NoteListModel.BuildCsvHeader("\t"), Is.EqualTo("\"Title\"\t\"Source\"\t\"Memo\"\t\"Tags\"\t\"Reference\"\t\"Created\""));
         }
 
+        [Test]
+        public void ToCsvLineTest()
+        {
+            NoteListModel model = new NoteListModel() { 
+                Title = "Title01",
+                Source = "Source01",
+                Memo = "Memo01",
+                Tags = "Tag01,Tag02,Tag03,Tag04",
+                Reference = "Reference01",
+                Created = DateTime.MinValue,
+            };
+
+            string expected = "\"Title01\"\t\"Source01\"\t\"Memo01\"\t\"Tag01,Tag02,Tag03,Tag04\"\t\"Reference01\"\t\"1/1/0001 12:00:00 AM\"";
+            string actual = model.ToCsvLine("\t");
+            Assert.That(actual, Is.EqualTo(expected));
+        }
         public class SplitTagsTest
         {
             [Test]
