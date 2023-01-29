@@ -15,7 +15,14 @@
     <Space Direction="DirectionVHType.Horizontal" Style="width:100%">
         <SpaceItem Style="width:50%">
             <FormItem Label="Title">
-                <Input @bind-Value="@context.Title" ReadOnly="@ReadOnly" />
+                @if (ShouldShowPreview())
+                {
+                    @(context.Title)
+                }
+                else
+                {
+                    <Input @bind-Value="@context.Title" ReadOnly="@ReadOnly" />
+                }
             </FormItem>
         </SpaceItem>
         <SpaceItem Style="width:50%">
@@ -43,20 +50,39 @@
     <Space Direction="DirectionVHType.Horizontal" Align="baseline" Style="width:100%">
         <SpaceItem Style="width:50%">
             <FormItem Label="Source">
-                <TextArea @bind-Value="@context.Source" MinRows="@_minRows" ReadOnly="@ReadOnly" />
+                @if (ShouldShowPreview())
+                {
+                    @((MarkupString)Markdig.Markdown.ToHtml(context.Source))
+                }
+                else
+                {
+                    <TextArea @bind-Value="@context.Source" MinRows="@_minRows" ReadOnly="@ReadOnly" />
+                }
             </FormItem>
         </SpaceItem>
         <SpaceItem Style="width:50%">
             <FormItem Label="Memo">
-                <TextArea @bind-Value="@context.Memo" MinRows="@_minRows" ReadOnly="@ReadOnly" />
+                @if (ShouldShowPreview())
+                {
+                    @((MarkupString)Markdig.Markdown.ToHtml(context.Memo))
+                }
+                else
+                {
+                    <TextArea @bind-Value="@context.Memo" MinRows="@_minRows" ReadOnly="@ReadOnly" />
+                }
             </FormItem>
         </SpaceItem>
     </Space>
     <FormItem>
         <Button Type="@ButtonType.Primary" HtmlType="submit" Danger>Submit</Button>
         <Button Type="@ButtonType.Primary" OnClick="Clear">Clear</Button>
+        @if(!ReadOnly)
+        {
+            <Switch @bind-Checked="_isPreview" CheckedChildren="Preview" UnCheckedChildren="Edit" />
+        }
     </FormItem>
 </Form>
+
 
 
 @code {
@@ -78,6 +104,7 @@
 
     private string _sizeValue = AntSizeLDSType.Default;
     private uint _minRows = 4;
+    private bool _isPreview = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -118,6 +145,7 @@
         this.NoteFormModel.Memo = string.Empty;
         this.NoteFormModel.Reference = string.Empty;
         this.NoteFormModel.Created = DateTime.MinValue;
+        this._isPreview = false;
         StateHasChanged();
     }
 
@@ -125,5 +153,10 @@
     {
         Tags = await NoteService.SelectAllTags();
         StateHasChanged();
+    }
+
+    private bool ShouldShowPreview()
+    {
+        return (ReadOnly || _isPreview);
     }
 }
