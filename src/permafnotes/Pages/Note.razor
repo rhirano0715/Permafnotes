@@ -71,21 +71,21 @@
 <Table @ref="_list" TItem="NoteListModel" DataSource="@NoteRecords" Size="TableSize.Middle" @bind-SelectedRows="_selectedRows" Style="width:100%" >
     <Selection Key="@context.Created.ToString()" Type="radio" Width="2%" />
     <Column @bind-Field="context.Title"  TData="string" Sortable Filterable Width="15%" />
-    <Column Title="Source" TData="string" Sortable Filterable Width="30%" >
+    <PropertyColumn Property="c=>c.Source" Sortable Filterable Width="30%">
         @* TODO: Markdown rendaring *@
         @((MarkupString)context.Source.Replace("\n", "<br />"))
-    </Column>
-    <Column Title="Memo" TData="string" Sortable Filterable Width="30%" >
+    </PropertyColumn>
+    <PropertyColumn Property="c=>c.Memo" Sortable Filterable Width="30%">
         @* TODO: Markdown rendaring *@
         @((MarkupString)context.Memo.Replace("\n", "<br />"))
-    </Column>
-    <Column Title="Tags" TData="string" Sortable Filterable Width="10%">
+    </PropertyColumn>
+    <PropertyColumn Property="c=>c.Tags" Filterable Width="10%">
         @foreach (var tag in context.SplitTags())
         {
             <Tag Color="green">@(string.IsNullOrEmpty(tag.Name) ? string.Empty : tag.Name)</Tag>
         }
-    </Column>
-    <Column Title="Reference"            TData="string"   Sortable Filterable Width="5%" >
+    </PropertyColumn>
+    <PropertyColumn Property="c=>c.Reference" Filterable Width="5%">
         @if (context.Reference.StartsWith("http://") || context.Reference.StartsWith("https://"))
         {
             <a href="@context.Reference">@context.Reference</a>
@@ -94,7 +94,7 @@
         {
             @context.Reference
         }
-    </Column>
+    </PropertyColumn>
     <Column @bind-Field="context.Created" TData="DateTime" Sortable Filterable Width="8%" />
 </Table>
 
