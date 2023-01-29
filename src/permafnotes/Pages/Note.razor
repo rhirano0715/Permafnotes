@@ -72,12 +72,10 @@
     <Selection Key="@context.Created.ToString()" Type="radio" Width="2%" />
     <Column @bind-Field="context.Title"  TData="string" Sortable Filterable Width="15%" />
     <PropertyColumn Property="c=>c.Source" Sortable Filterable Width="30%">
-        @* TODO: Markdown rendaring *@
-        @((MarkupString)context.Source.Replace("\n", "<br />"))
+        @((MarkupString)Markdig.Markdown.ToHtml(context.Source))
     </PropertyColumn>
     <PropertyColumn Property="c=>c.Memo" Sortable Filterable Width="30%">
-        @* TODO: Markdown rendaring *@
-        @((MarkupString)context.Memo.Replace("\n", "<br />"))
+        @((MarkupString)Markdig.Markdown.ToHtml(context.Memo))
     </PropertyColumn>
     <PropertyColumn Property="c=>c.Tags" Filterable Width="10%">
         @foreach (var tag in context.SplitTags())
