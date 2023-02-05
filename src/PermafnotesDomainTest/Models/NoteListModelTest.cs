@@ -29,6 +29,73 @@ namespace PermafnotesDomain.Models
             string actual = model.ToCsvLine("\t");
             Assert.That(actual, Is.EqualTo(expected));
         }
+
+        public class HasUrlReferenceTest
+        {
+            [Test]
+            public void RefernceIsNumberThenFalse()
+            {
+                NoteListModel model = new NoteListModel()
+                {
+                    Title = "Title01",
+                    Source = "Source01",
+                    Memo = "Memo01",
+                    Tags = "Tag01,Tag02,Tag03,Tag04",
+                    Reference = "123",
+                    Created = DateTime.MinValue,
+                };
+
+                Assert.That(model.HasUrlReference(), Is.False);
+            }
+
+            [Test]
+            public void RefernceIsHttpsUrlThenTrue()
+            {
+                NoteListModel model = new NoteListModel()
+                {
+                    Title = "Title01",
+                    Source = "Source01",
+                    Memo = "Memo01",
+                    Tags = "Tag01,Tag02,Tag03,Tag04",
+                    Reference = "https://aaaa.aaa.com",
+                    Created = DateTime.MinValue,
+                };
+
+                Assert.That(model.HasUrlReference(), Is.True);
+            }
+
+            [Test]
+            public void RefernceIsHttpUrlThenTrue()
+            {
+                NoteListModel model = new NoteListModel()
+                {
+                    Title = "Title01",
+                    Source = "Source01",
+                    Memo = "Memo01",
+                    Tags = "Tag01,Tag02,Tag03,Tag04",
+                    Reference = "http://aaaa.aaa.com",
+                    Created = DateTime.MinValue,
+                };
+
+                Assert.That(model.HasUrlReference(), Is.True);
+            }
+
+            [Test]
+            public void RefernceIsSimpleStringUrlThenTrue()
+            {
+                NoteListModel model = new NoteListModel()
+                {
+                    Title = "Title01",
+                    Source = "Source01",
+                    Memo = "Memo01",
+                    Tags = "Tag01,Tag02,Tag03,Tag04",
+                    Reference = "Reference01",
+                    Created = DateTime.MinValue,
+                };
+
+                Assert.That(model.HasUrlReference(), Is.False);
+            }
+        }
         public class SplitTagsTest
         {
             [Test]

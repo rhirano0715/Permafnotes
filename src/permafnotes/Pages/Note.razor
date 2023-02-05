@@ -84,7 +84,7 @@
         }
     </PropertyColumn>
     <PropertyColumn Property="c=>c.Reference" Filterable Width="5%">
-        @if (context.Reference.StartsWith("http://") || context.Reference.StartsWith("https://"))
+        @if (context.HasUrlReference())
         {
             <a href="@context.Reference">@context.Reference</a>
         }

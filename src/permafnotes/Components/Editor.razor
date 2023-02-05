@@ -143,7 +143,10 @@
     {
         this.NoteFormModel.Source = string.Empty;
         this.NoteFormModel.Memo = string.Empty;
-        this.NoteFormModel.Reference = string.Empty;
+        if (!this.NoteFormModel.HasUrlReference())
+        {
+            this.NoteFormModel.Reference = string.Empty;
+        }
         this.NoteFormModel.Created = DateTime.MinValue;
         this._isPreview = false;
         StateHasChanged();

@@ -22,6 +22,9 @@ public class NoteFormModel
 
     public DateTime Created { get; set; } = DateTime.MinValue;
 
+    public bool HasUrlReference()
+        => Reference.StartsWith("http://") || Reference.StartsWith("https://");
+
     public override string ToString()
         => $"{Title}, {Source}, {Memo}, {ConvertTagsToString()}, {Reference}";
 

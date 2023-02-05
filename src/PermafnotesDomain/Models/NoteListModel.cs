@@ -79,4 +79,7 @@ public record NoteListModel
                     this.Created.ToString().EscapeDoubleQuote()
                 }
             );
+
+    public bool HasUrlReference()
+        => Reference.StartsWith("http://") || Reference.StartsWith("https://");
 }
