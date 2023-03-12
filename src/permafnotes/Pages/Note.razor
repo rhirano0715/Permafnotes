@@ -47,6 +47,23 @@
 
 <br />
 
+<div class="search">
+    <Checkbox @bind-Checked="_needToDisplaySearch">Search</Checkbox>
+    @if (_needToDisplaySearch)
+    {
+        <Space>
+            <SpaceItem>
+                <Search Placeholder="input search text" EnterButton="true" @bind-Value="@SearchKey" OnSearch="OnSearch" />
+            </SpaceItem>
+            <SpaceItem>
+                <Button Type="@ButtonType.Primary" OnClick="Refresh">Clear</Button>
+            </SpaceItem>
+        </Space>
+    }
+</div>
+
+<br />
+
 <div class="list_action">
     <Title>Note list</Title>
     <Space>
@@ -96,7 +113,7 @@
     <Column @bind-Field="context.Created" TData="DateTime" Sortable Filterable Width="8%" />
 </Table>
 
-@code {
+    @code {
     [Inject]
     private ILogger<Note> logger { get; set; }
     public IEnumerable<NoteListModel> NoteRecords { get; set; } = new List<NoteListModel>();
@@ -112,6 +129,9 @@
 
     private bool _needToDisplayImportExport = false;
     private IEnumerable<IBrowserFile> _choosenFiles = new List<IBrowserFile>();
+
+    private bool _needToDisplaySearch = true;
+    private string SearchKey { get; set; } = string.Empty;
 
     ITable? _list;
     private List<string> ToolbarItems = new List<string>() { "Search" };
@@ -152,12 +172,25 @@
         await this.RefreshList();
     }
 
+    private async Task OnSearch()
+        => await RefreshList();
+
     private async Task Refresh()
         => await this.RefreshList();
 
     private async Task RefreshList(bool onlyCache = false)
     {
         NoteRecords = await NoteService.FetchAll(onlyCache);
+        if (string.IsNullOrEmpty(SearchKey))
+            return;
+
+        NoteRecords = NoteRecords.Where(x =>
+            x.Title.Contains(SearchKey)
+            || x.Reference.Contains(SearchKey)
+            || x.Tags.Contains(SearchKey)
+            || x.Source.Contains(SearchKey)
+            || x.Memo.Contains(SearchKey)
+        );
     }
 
     private void StartEdit()
