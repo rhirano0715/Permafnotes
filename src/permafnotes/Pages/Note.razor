@@ -56,7 +56,7 @@
                 <Search Placeholder="input search text" EnterButton="true" @bind-Value="@SearchKey" OnSearch="OnSearch" />
             </SpaceItem>
             <SpaceItem>
-                <Button Type="@ButtonType.Primary" OnClick="Refresh">Clear</Button>
+                <Button OnClick="ClearSearch">Clear</Button>
             </SpaceItem>
         </Space>
     }
@@ -177,6 +177,12 @@
 
     private async Task Refresh()
         => await this.RefreshList();
+
+    private async Task ClearSearch()
+    {
+        SearchKey = string.Empty;
+        await this.RefreshList();
+    }
 
     private async Task RefreshList(bool onlyCache = false)
     {
