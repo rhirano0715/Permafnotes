@@ -47,8 +47,8 @@
             </SelectOptions>
         </Select>
     </FormItem>
-    <Space Direction="DirectionVHType.Horizontal" Align="baseline" Style="width:100%">
-        <SpaceItem Style="width:50%">
+    <Space Wrap Align="baseline">
+        <SpaceItem Style="min-width:500px;">
             <FormItem Label="Source">
                 @if (ShouldShowPreview())
                 {
@@ -60,7 +60,7 @@
                 }
             </FormItem>
         </SpaceItem>
-        <SpaceItem Style="width:50%">
+        <SpaceItem Style="min-width:500px;">
             <FormItem Label="Memo">
                 @if (ShouldShowPreview())
                 {
