@@ -103,7 +103,8 @@
     <PropertyColumn Property="c=>c.Reference" Filterable Width="5%">
         @if (context.HasUrlReference())
         {
-            <a href="@context.Reference">@context.Reference</a>
+            @((MarkupString)Markdig.Markdown.ToHtml($"[link]({context.Reference})"))
+            @*<a href="@context.Reference">@context.Reference</a>*@
         }
         else
         {
