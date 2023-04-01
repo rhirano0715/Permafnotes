@@ -153,8 +153,17 @@
         await this.RefreshList();
     }
 
-    private async Task OnSearch()
-        => await RefreshList();
+    private void OnSearch()
+        => NoteRecords = this.Filter(this.SearchKey);
+
+    private IEnumerable<NoteListModel> Filter(string key)
+    => NoteRecords.Where(x =>
+        x.Title.Contains(key)
+        || x.Reference.Contains(key)
+        || x.Tags.Contains(key)
+        || x.Source.Contains(key)
+        || x.Memo.Contains(key)
+    );
 
     private async Task Refresh()
         => await this.RefreshList();
@@ -171,13 +180,7 @@
         if (string.IsNullOrEmpty(SearchKey))
             return;
 
-        NoteRecords = NoteRecords.Where(x =>
-            x.Title.Contains(SearchKey)
-            || x.Reference.Contains(SearchKey)
-            || x.Tags.Contains(SearchKey)
-            || x.Source.Contains(SearchKey)
-            || x.Memo.Contains(SearchKey)
-        );
+        NoteRecords = this.Filter(this.SearchKey);
     }
 
     private void StartEdit()
