@@ -26,12 +26,33 @@
     <Editor NoteFormModel="@_noteFormModel" />
 </div>
 
+<div class="list_action">
+    <Title>Note list</Title>
+    <Space>
+        <SpaceItem>
+            <Search Placeholder="input filter text" EnterButton="true" @bind-Value="@SearchKey" OnSearch="OnSearch" />
+        </SpaceItem>
+        <SpaceItem>
+            <Button OnClick="ClearSearch">Clear filter</Button>
+        </SpaceItem>
+        <SpaceItem>
+            <Button Type="@ButtonType.Primary" OnClick="Refresh">Reflesh</Button>
+        </SpaceItem>
+        @if(Selected)
+        {
+            <SpaceItem>
+                <Button Type="@ButtonType.Primary" OnClick="ClearListSelection">Clear selection</Button>
+            </SpaceItem>
+            <SpaceItem>
+                <Button Type="@ButtonType.Primary" OnClick="StartEdit">StartEdit</Button>
+            </SpaceItem>
 
-<div class="import_export">
-    <Checkbox @bind-Checked="_needToDisplayImportExport">Import/Export</Checkbox>
-    @if(_needToDisplayImportExport)
-    {
-        <Space>
+        }
+        <SpaceItem>
+            <Checkbox @bind-Checked="_needToDisplayImportExport">Import/Export</Checkbox>
+        </SpaceItem>
+        @if (_needToDisplayImportExport)
+        {
             <SpaceItem>
                 <InputFile OnChange="@ChooseFiles" multiple />
             </SpaceItem>
@@ -41,49 +62,9 @@
             <SpaceItem>
                 <Button Type="@ButtonType.Primary" OnClick="Export">Export</Button>
             </SpaceItem>
-        </Space>
-    }
-</div>
-
-<br />
-
-<div class="search">
-    <Checkbox @bind-Checked="_needToDisplaySearch">Search</Checkbox>
-    @if (_needToDisplaySearch)
-    {
-        <Space>
-            <SpaceItem>
-                <Search Placeholder="input search text" EnterButton="true" @bind-Value="@SearchKey" OnSearch="OnSearch" />
-            </SpaceItem>
-            <SpaceItem>
-                <Button OnClick="ClearSearch">Clear</Button>
-            </SpaceItem>
-        </Space>
-    }
-</div>
-
-<br />
-
-<div class="list_action">
-    <Title>Note list</Title>
-    <Space>
-        <SpaceItem>
-            <Button Type="@ButtonType.Primary" OnClick="Refresh">Reflesh</Button>
-        </SpaceItem>
-        @if(Selected)
-        {
-            <SpaceItem>
-                <Button Type="@ButtonType.Primary" OnClick="ClearListSelection">Clear</Button>
-            </SpaceItem>
-            <SpaceItem>
-                <Button Type="@ButtonType.Primary" OnClick="StartEdit">StartEdit</Button>
-            </SpaceItem>
-
         }
     </Space>
 </div>
-
-<br />
 
 <Table @ref="_list" TItem="NoteListModel" DataSource="@NoteRecords" Size="TableSize.Middle" @bind-SelectedRows="_selectedRows" Style="width:100%" >
     <Selection Key="@context.Created.ToString()" Type="radio" Width="2%" />
@@ -131,7 +112,6 @@
     private bool _needToDisplayImportExport = false;
     private IEnumerable<IBrowserFile> _choosenFiles = new List<IBrowserFile>();
 
-    private bool _needToDisplaySearch = true;
     private string SearchKey { get; set; } = string.Empty;
 
     ITable? _list;
