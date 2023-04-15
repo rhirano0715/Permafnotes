@@ -12,8 +12,8 @@
 <Title>Note editor</Title>
 
 <Form Model="@NoteFormModel" OnFinish="OnFinish" OnFinishFailed="OnFinishFailed" >
-    <Space Direction="DirectionVHType.Horizontal" Style="width:100%">
-        <SpaceItem Style="width:50%">
+    <Space Wrap>
+        <SpaceItem Style="min-width:450px;">
             <FormItem Label="Title">
                 @if (ReadOnly)
                 {
@@ -25,30 +25,34 @@
                 }
             </FormItem>
         </SpaceItem>
-        <SpaceItem Style="width:50%">
+        <SpaceItem Style="min-width:450px;">
             <FormItem Label="Reference">
                 <Input @bind-Value="@context.Reference" />
             </FormItem>
         </SpaceItem>
     </Space>
-    <FormItem Label="Tags">
-        <Select Mode="tags"
-                @bind-Values="@context.Tags"
-                Placeholder="Please select"
-                TItemValue="string"
-                TItem="string"
-                Size="@_sizeValue"
-                OnSelectedItemsChanged="OnSelectedItemsChangedHandler">
-            <SelectOptions>
-                @foreach (var tag in Tags)
-                {
-                    <SelectOption TItemValue="string" TItem="string" Value=@tag.Name Label=@tag.Name />
-                }
-            </SelectOptions>
-        </Select>
-    </FormItem>
+    <Space>
+        <SpaceItem Style="min-width:450px;">
+            <FormItem Label="Tags">
+                <Select Mode="tags"
+                        @bind-Values="@context.Tags"
+                        Placeholder="Please select"
+                        TItemValue="string"
+                        TItem="string"
+                        Size="@_sizeValue"
+                        OnSelectedItemsChanged="OnSelectedItemsChangedHandler">
+                    <SelectOptions>
+                        @foreach (var tag in Tags)
+                        {
+                            <SelectOption TItemValue="string" TItem="string" Value=@tag.Name Label=@tag.Name />
+                        }
+                    </SelectOptions>
+                </Select>
+            </FormItem>
+        </SpaceItem>
+    </Space>
     <Space Wrap Align="baseline">
-        <SpaceItem Style="min-width:500px;">
+        <SpaceItem Style="min-width:450px;">
             <FormItem Label="Source">
                 @if (ShouldShowPreview())
                 {
@@ -60,7 +64,7 @@
                 }
             </FormItem>
         </SpaceItem>
-        <SpaceItem Style="min-width:500px;">
+        <SpaceItem Style="min-width:450px;">
             <FormItem Label="Memo">
                 @if (ShouldShowPreview())
                 {
