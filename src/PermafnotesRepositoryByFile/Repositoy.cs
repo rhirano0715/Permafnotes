@@ -140,14 +140,15 @@ namespace PermafnotesRepositoryByFile
 
             await this._fileService.WriteNote(uploadName, uploadText);
 
-            var cache = await this.LoadCache();
-            if (cache.Any(x => x.Created == noteListModel.Created))
-            {
-                var newCache = cache.Where(x => x.Created != noteListModel.Created).ToList();
-                newCache.Add(noteListModel);
-                _noteRecords = newCache;
-                await SaveCache(_noteRecords);
-            }
+            // TODO: Let them concentrate only on writing notes. The cache should not have to be updated here.
+            //var cache = await this.LoadCache();
+            //if (cache.Any(x => x.Created == noteListModel.Created))
+            //{
+            //    var newCache = cache.Where(x => x.Created != noteListModel.Created).ToList();
+            //    newCache.Add(noteListModel);
+            //    _noteRecords = newCache;
+            //    await SaveCache(_noteRecords);
+            //}
         }
 
         private void AddToNoteRecords(NoteListModel noteListModel)
