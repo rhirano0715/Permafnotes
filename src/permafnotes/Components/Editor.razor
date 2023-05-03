@@ -96,7 +96,17 @@
     [Parameter]
     public NoteFormModel NoteFormModel { get; set; } = new();
 
-    public IEnumerable<NoteTagModel> Tags { get; set; } = new List<NoteTagModel>();
+    public IEnumerable<NoteTagModel> Tags 
+    { 
+        get
+        {
+            foreach (var t in _tags)
+            {
+                yield return t;
+            }
+        }
+    }
+    private List<NoteTagModel> _tags = new();
 
     private bool ReadOnly
     {
@@ -158,7 +168,12 @@
 
     private async Task UpdateTag()
     {
-        Tags = await NoteService.SelectAllTags();
+        await foreach (var t in NoteService.SelectAllTags())
+        {
+            if (_tags.Any(x => x.Name == t.Name))
+                continue;
+            _tags.Add(t);
+        }
         StateHasChanged();
     }
 

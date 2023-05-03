@@ -102,9 +102,9 @@ namespace PermafnotesRepositoryByFile
             }
         }
 
-        public async Task<IEnumerable<NoteTagModel>> SelectAllTags()
+        public async IAsyncEnumerable<NoteTagModel> SelectAllTags()
         {
-            List<NoteTagModel> result = new();
+            List<NoteTagModel> returned = new();
             if (this._noteRecords.Count() <= 0)
             {
                 await this.FetchAll(onlyCache: true);
@@ -113,13 +113,12 @@ namespace PermafnotesRepositoryByFile
             {
                 foreach (var t in m.SplitTags())
                 {
-                    if (result.Any(x => x.Name == t.Name))
+                    if (returned.Any(x => x.Name == t.Name))
                         continue;
-                    result.Add(t);
+                    returned.Add(t);
+                    yield return t;
                 }
             }
-
-            return result;
         }
 
         private IEnumerable<NoteListModel> OrderByDescendingNoteRecords()

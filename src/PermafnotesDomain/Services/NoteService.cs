@@ -29,7 +29,12 @@ namespace PermafnotesDomain.Services
         public async Task Import(byte[] inputBuffers)
             => await this._repository.Import(inputBuffers);
 
-        public async Task<IEnumerable<NoteTagModel>> SelectAllTags()
-            => await this._repository.SelectAllTags();
+        public async IAsyncEnumerable<NoteTagModel> SelectAllTags()
+        {
+            await foreach (var t in this._repository.SelectAllTags())
+            {
+                yield return t;
+            }
+        }
     }
 }
