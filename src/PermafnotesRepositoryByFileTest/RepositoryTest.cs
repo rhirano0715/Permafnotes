@@ -40,6 +40,11 @@ namespace PermafnotesRepositoryByFile
 
         public class SelectAllTagsTest
         {
+            private async IAsyncEnumerable<NoteTagModel> Expected()
+            {
+                yield return new NoteTagModel("Tag1");
+            }
+
             [Test]
             public async Task WhenAlreadyLoadedNotes()
             {
@@ -56,15 +61,21 @@ namespace PermafnotesRepositoryByFile
                 await repository.FetchAll();
 
                 // Act
-                var actual = await repository.SelectAllTags();
+                var actual = repository.SelectAllTags();
 
                 // Assert
-                IEnumerable<NoteTagModel> expected = new List<NoteTagModel>()
+                var expected = new List<NoteTagModel>()
                 {
                     new NoteTagModel("Tag1")
                 };
 
-                Assert.That(actual, Is.EqualTo(expected), "SelectAllTags's return don't match the expected");
+                var i = 0;
+                await foreach (var a in repository.SelectAllTags())
+                {
+                    Assert.That(a, Is.EqualTo(expected[i++]), "SelectAllTags's return don't match the expected");
+                }
+
+                Assert.That(i, Is.EqualTo(expected.Count), "SelectAllTags's return don't match the expected");
             }
 
             [Test]
@@ -80,15 +91,21 @@ namespace PermafnotesRepositoryByFile
                 Repositoy repository = Repositoy.CreateRepositoryUsingFileSystem(logger, inputAndActualDir.ToString());
 
                 // Act
-                var actual = await repository.SelectAllTags();
+                var actual = repository.SelectAllTags();
 
                 // Assert
-                IEnumerable<NoteTagModel> expected = new List<NoteTagModel>()
+                var expected = new List<NoteTagModel>()
                 {
                     new NoteTagModel("Tag1")
                 };
 
-                Assert.That(actual, Is.EqualTo(expected), "SelectAllTags's return don't match the expected");
+                var i = 0;
+                await foreach (var a in repository.SelectAllTags())
+                {
+                    Assert.That(a, Is.EqualTo(expected[i++]), "SelectAllTags's return don't match the expected");
+                }
+
+                Assert.That(i, Is.EqualTo(expected.Count), "SelectAllTags's return don't match the expected");
             }
         }
 
