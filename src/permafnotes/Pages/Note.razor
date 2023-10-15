@@ -82,7 +82,8 @@
     <PropertyColumn Property="c=>c.Tags" Filterable Width="10%">
         @foreach (var tag in context.SplitTags())
         {
-            <Tag Color="green">@(string.IsNullOrEmpty(tag.Name) ? string.Empty : tag.Name)</Tag>
+            string color = SelectTagColor(tag);
+            <Tag Color="@color">@(string.IsNullOrEmpty(tag.Name) ? string.Empty : tag.Name)</Tag>
         }
     </PropertyColumn>
     <PropertyColumn Property="c=>c.Reference" Filterable Width="5%">
@@ -98,10 +99,11 @@
     <Column @bind-Field="context.Created" TData="DateTime" Sortable Filterable Width="8%" />
 </Table>
 
-    @code {
+@code {
     [Inject]
     private ILogger<Note> logger { get; set; }
     public IEnumerable<NoteListModel> NoteRecords { get; set; } = new List<NoteListModel>();
+    public List<NoteTagModel> Tags { get; set; } = new List<NoteTagModel>();
     private bool Selected
     {
         get
@@ -180,6 +182,13 @@
     private async Task RefreshList(bool onlyCache = false)
     {
         NoteRecords = await NoteService.FetchAll(onlyCache);
+        await foreach (var t in NoteService.SelectAllTags())
+        {
+            if (Tags.Any(x => x.Name == t.Name))
+                continue;
+            Tags.Add(t);
+        }
+
         if (string.IsNullOrEmpty(SearchKey))
             return;
 
@@ -205,6 +214,70 @@
     private void OnRowClick(RowData<NoteListModel> row)
     {
         logger.LogDebug($"current row: ${row.Data.ToString()}");
+    }
+
+    private string SelectTagColor(NoteTagModel tag)
+    {
+        string name = string.IsNullOrEmpty(tag.Name) ? string.Empty : tag.Name;
+        int index = Tags.FindIndex(x => x.Name == name);
+        int devider = 12;
+        if (index == -1)
+        {
+            // not found
+            return "gray";
+        }
+        else if (index % devider == 0)
+        {
+            return "green";
+        }
+        else if (index % devider == 1)
+        {
+            return "geekblue";
+        }
+        else if (index % devider == 2)
+        {
+            return "volcano";
+        }
+        else if (index % devider == 3)
+        {
+            return "red";
+        }
+        else if (index % devider == 4)
+        {
+            return "orange";
+        }
+        else if (index % devider == 5)
+        {
+            return "gold";
+        }
+        else if (index % devider == 6)
+        {
+            return "yellow";
+        }
+        else if (index % devider == 7)
+        {
+            return "lime";
+        }
+        else if (index % devider == 8)
+        {
+            return "cyan";
+        }
+        else if (index % devider == 9)
+        {
+            return "blue";
+        }
+        else if (index % devider == 10)
+        {
+            return "purple";
+        }
+        else if (index % devider == 11)
+        {
+            return "magenta";
+        }
+        else
+        {
+            return "gray";
+        }
     }
 }
 
