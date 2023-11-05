@@ -26,12 +26,13 @@
     }
 </style>
 
+<Title>Note</Title>
+
 <div class="note_form">
     <Editor NoteFormModel="@_noteFormModel" />
 </div>
 
 <div class="list_action">
-    <Title>Note list</Title>
     <Space>
         <SpaceItem Style="min-width:200px;">
             <Search Placeholder="input filter text" EnterButton="true" @bind-Value="@SearchKey" OnSearch="OnSearch" />
@@ -73,28 +74,34 @@
 <div class="cards">
     @foreach (var rec in NoteRecords)
     {
-        <Card Title="@rec.Title" Style="width:80%;">
+        <Card Title="@rec.Title">
             <Extra>
                 @if (rec.HasUrlReference())
                 {
                     <a href="@rec.Reference" target="_blank">link</a>
+                }
+                else if (int.TryParse(rec.Reference, out int result))
+                {
+                    @("p." + @rec.Reference)
                 }
                 else
                 {
                     @rec.Reference
                 }
 
-                @foreach (var tag in rec.SplitTags())
-                {
-                    string color = SelectTagColor(tag);
-                    <Tag Color="@color">@(string.IsNullOrEmpty(tag.Name) ? string.Empty : tag.Name)</Tag>
-                }
-
-                @rec.Created
-
                 <Button Type="@ButtonType.Primary" Danger OnClick="(e => _noteFormModel = rec.ToNoteFormModel())">Edit</Button>
             </Extra>
             <Body>
+                <p>
+                    @rec.Created
+
+                    @foreach (var tag in rec.SplitTags())
+                    {
+                        string color = SelectTagColor(tag);
+                        <Tag Color="@color">@(string.IsNullOrEmpty(tag.Name) ? string.Empty : tag.Name)</Tag>
+                    }
+                </p>
+
                 Source:
                 @((MarkupString)Markdig.Markdown.ToHtml(rec.Source))
 
