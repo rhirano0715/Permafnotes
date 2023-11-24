@@ -9,74 +9,56 @@
 
 @inject NoteService NoteService
 
-@*<Title>Note editor</Title>*@
-
-<Form Model="@NoteFormModel" OnFinish="OnFinish" OnFinishFailed="OnFinishFailed" >
-    <Space Wrap>
-        <SpaceItem Style="min-width:450px;">
-            <FormItem Label="Title">
-                @if (ReadOnly)
+<Form Model="@NoteFormModel" OnFinish="OnFinish" OnFinishFailed="OnFinishFailed"  >
+    <FormItem Label="Title">
+        @if (ReadOnly)
+        {
+            @(context.Title)
+        }
+        else
+        {
+            <Input @bind-Value="@context.Title" ReadOnly="@ReadOnly" />
+        }
+    </FormItem>
+    <FormItem Label="Reference">
+        <Input @bind-Value="@context.Reference" />
+    </FormItem>
+    <FormItem Label="Tags">
+        <Select Mode="tags"
+                @bind-Values="@context.Tags"
+                Placeholder="Please select"
+                TItemValue="string"
+                TItem="string"
+                Size="@_sizeValue"
+                OnSelectedItemsChanged="OnSelectedItemsChangedHandler">
+            <SelectOptions>
+                @foreach (var tag in Tags)
                 {
-                    @(context.Title)
+                    <SelectOption TItemValue="string" TItem="string" Value=@tag.Name Label=@tag.Name />
                 }
-                else
-                {
-                    <Input @bind-Value="@context.Title" ReadOnly="@ReadOnly" />
-                }
-            </FormItem>
-        </SpaceItem>
-        <SpaceItem Style="min-width:450px;">
-            <FormItem Label="Reference">
-                <Input @bind-Value="@context.Reference" />
-            </FormItem>
-        </SpaceItem>
-    </Space>
-    <Space>
-        <SpaceItem Style="min-width:450px;">
-            <FormItem Label="Tags">
-                <Select Mode="tags"
-                        @bind-Values="@context.Tags"
-                        Placeholder="Please select"
-                        TItemValue="string"
-                        TItem="string"
-                        Size="@_sizeValue"
-                        OnSelectedItemsChanged="OnSelectedItemsChangedHandler">
-                    <SelectOptions>
-                        @foreach (var tag in Tags)
-                        {
-                            <SelectOption TItemValue="string" TItem="string" Value=@tag.Name Label=@tag.Name />
-                        }
-                    </SelectOptions>
-                </Select>
-            </FormItem>
-        </SpaceItem>
-    </Space>
-    <Space Wrap Align="baseline">
-        <SpaceItem Style="min-width:450px;">
-            <FormItem Label="Source">
-                @if (ShouldShowPreview())
-                {
-                    @((MarkupString)Markdig.Markdown.ToHtml(context.Source))
-                }
-                else
-                {
-                    <TextArea @bind-Value="@context.Source" MinRows="@_minRows" ReadOnly="@ReadOnly" />
-                }
-            </FormItem>
-        </SpaceItem>
-        <SpaceItem Style="min-width:450px;">
-            <FormItem Label="Memo">
-                @if (ShouldShowPreview())
-                {
-                    @((MarkupString)Markdig.Markdown.ToHtml(context.Memo))
-                }
-                else
-                {
-                    <TextArea @bind-Value="@context.Memo" MinRows="@_minRows" ReadOnly="@ReadOnly" />
-                }
-            </FormItem>
-        </SpaceItem>
-    </Space>
+            </SelectOptions>
+        </Select>
+    </FormItem>
+    <FormItem Label="Source">
+        @if (ShouldShowPreview())
+        {
+            @((MarkupString)Markdig.Markdown.ToHtml(context.Source))
+        }
+        else
+        {
+            <TextArea @bind-Value="@context.Source" MinRows="@_minRows" ReadOnly="@ReadOnly" />
+        }
+    </FormItem>
+    <FormItem Label="Memo">
+        @if (ShouldShowPreview())
+        {
+            @((MarkupString)Markdig.Markdown.ToHtml(context.Memo))
+        }
+        else
+        {
+            <TextArea @bind-Value="@context.Memo" MinRows="@_minRows" ReadOnly="@ReadOnly" />
+        }
+    </FormItem>
     <FormItem>
         <Button Type="@ButtonType.Primary" HtmlType="submit" Danger>Submit</Button>
         <Button Type="@ButtonType.Primary" OnClick="Clear">Clear</Button>

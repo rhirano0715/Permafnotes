@@ -20,129 +20,108 @@
 
 @inject NoteService NoteService
 
-<style>
-    .ant-table-row {
-        vertical-align: top;
-    }
-</style>
+<Space Direction="DirectionVHType.Vertical" >
+    <SpaceItem>
+        <Title>Note</Title>
+    </SpaceItem>
 
-<Title>Note</Title>
+    <SpaceItem>
+        <Editor NoteFormModel="@_noteFormModel" />
+    </SpaceItem>
 
-<div class="note_form">
-    <Editor NoteFormModel="@_noteFormModel" />
-</div>
-
-<div class="list_action">
-    <Space>
-        <SpaceItem Style="min-width:200px;">
-            <Search Placeholder="input filter text" EnterButton="true" @bind-Value="@SearchKey" OnSearch="OnSearch" />
-        </SpaceItem>
-        <SpaceItem>
-            <Button OnClick="ClearSearch">Clear filter</Button>
-        </SpaceItem>
-        <SpaceItem>
-            <Button Type="@ButtonType.Primary" OnClick="Refresh">Reflesh</Button>
-        </SpaceItem>
-        @if(Selected)
-        {
-            <SpaceItem>
-                <Button Type="@ButtonType.Primary" OnClick="ClearListSelection">Clear selection</Button>
+    <SpaceItem>
+        <Space>
+            <SpaceItem Style="min-width:200px;">
+                <Search Placeholder="input filter text" EnterButton="true" @bind-Value="@SearchKey" OnSearch="OnSearch" />
             </SpaceItem>
             <SpaceItem>
-                <Button Type="@ButtonType.Primary" OnClick="StartEdit">StartEdit</Button>
-            </SpaceItem>
-
-        }
-        <SpaceItem>
-            <Checkbox @bind-Checked="_needToDisplayImportExport">Import/Export</Checkbox>
-        </SpaceItem>
-        @if (_needToDisplayImportExport)
-        {
-            <SpaceItem>
-                <InputFile OnChange="@ChooseFiles" multiple />
+                <Button OnClick="ClearSearch">Clear filter</Button>
             </SpaceItem>
             <SpaceItem>
-                <Button Type="@ButtonType.Primary" OnClick="Import" Danger>Import</Button>
+                <Button Type="@ButtonType.Primary" OnClick="Refresh">Reflesh</Button>
             </SpaceItem>
+            @if (Selected)
+            {
+                <SpaceItem>
+                    <Button Type="@ButtonType.Primary" OnClick="ClearListSelection">Clear selection</Button>
+                </SpaceItem>
+                <SpaceItem>
+                    <Button Type="@ButtonType.Primary" OnClick="StartEdit">StartEdit</Button>
+                </SpaceItem>
+
+            }
             <SpaceItem>
-                <Button Type="@ButtonType.Primary" OnClick="Export">Export</Button>
+                <Checkbox @bind-Checked="_needToDisplayImportExport">Import/Export</Checkbox>
             </SpaceItem>
-        }
-    </Space>
-</div>
-
-<div class="cards">
-    @foreach (var rec in NoteRecords)
-    {
-        <Card Title="@rec.Title">
-            <Extra>
-                @if (rec.HasUrlReference())
-                {
-                    <a href="@rec.Reference" target="_blank">link</a>
-                }
-                else if (int.TryParse(rec.Reference, out int result))
-                {
-                    @("p." + @rec.Reference)
-                }
-                else
-                {
-                    @rec.Reference
-                }
-
-                <Button Type="@ButtonType.Primary" Danger OnClick="(e => _noteFormModel = rec.ToNoteFormModel())">Edit</Button>
-            </Extra>
-            <Body>
-                <p>
-                    @rec.Created
-
-                    @foreach (var tag in rec.SplitTags())
-                    {
-                        string color = SelectTagColor(tag);
-                        <Tag Color="@color">@(string.IsNullOrEmpty(tag.Name) ? string.Empty : tag.Name)</Tag>
-                    }
-                </p>
-
-                Source:
-                @((MarkupString)Markdig.Markdown.ToHtml(rec.Source))
-
-                Memo:
-                @((MarkupString)Markdig.Markdown.ToHtml(rec.Memo))
-            </Body>
-
-        </Card>
-    }
-</div>
-
-
-@*<Table @ref="_list" TItem="NoteListModel" DataSource="@NoteRecords" Size="TableSize.Middle" @bind-SelectedRows="_selectedRows" Style="width:100%" >
-    <Selection Key="@context.Created.ToString()" Type="radio" Width="2%" />
-    <Column @bind-Field="context.Title"  TData="string" Sortable Filterable Width="15%" />
-    <PropertyColumn Property="c=>c.Source" Sortable Filterable Width="30%">
-        @((MarkupString)Markdig.Markdown.ToHtml(context.Source))
-    </PropertyColumn>
-    <PropertyColumn Property="c=>c.Memo" Sortable Filterable Width="30%">
-        @((MarkupString)Markdig.Markdown.ToHtml(context.Memo))
-    </PropertyColumn>
-    <PropertyColumn Property="c=>c.Tags" Filterable Width="10%">
-        @foreach (var tag in context.SplitTags())
+            @if (_needToDisplayImportExport)
+            {
+                <SpaceItem>
+                    <InputFile OnChange="@ChooseFiles" multiple />
+                </SpaceItem>
+                <SpaceItem>
+                    <Button Type="@ButtonType.Primary" OnClick="Import" Danger>Import</Button>
+             </SpaceItem>
+                <SpaceItem>
+                    <Button Type="@ButtonType.Primary" OnClick="Export">Export</Button>
+                </SpaceItem>
+            }
+        </Space>
+    </SpaceItem>
+    <SpaceItem>
+        @foreach (var rec in NoteRecords)
         {
-            string color = SelectTagColor(tag);
-            <Tag Color="@color">@(string.IsNullOrEmpty(tag.Name) ? string.Empty : tag.Name)</Tag>
+            <Card Title="@rec.Title">
+                <Extra>
+                    <Space>
+                        <SpaceItem>
+                            @if (rec.HasUrlReference())
+                            {
+                                <a href="@rec.Reference" target="_blank">link</a>
+                            }
+                            else if (int.TryParse(rec.Reference, out int result))
+                            {
+                                @("p." + @rec.Reference)
+                            }
+                            else
+                            {
+                                @rec.Reference
+                            }
+                         </SpaceItem>
+                         <SpaceItem>
+                             <Button Type="@ButtonType.Primary" Danger OnClick="(e => _noteFormModel = rec.ToNoteFormModel())">Edit</Button>
+                         </SpaceItem>
+                    </Space>
+                </Extra>
+                <Body>
+                    <Space Direction="DirectionVHType.Vertical">
+                        <SpaceItem>
+                            @rec.Created
+
+                            @foreach (var tag in rec.SplitTags())
+                            {
+                                string color = SelectTagColor(tag);
+                                <Tag Color="@color">@(string.IsNullOrEmpty(tag.Name) ? string.Empty : tag.Name)</Tag>
+                            }
+                        </SpaceItem>
+                        <SpaceItem>
+                            Source:
+                        </SpaceItem>
+                        <SpaceItem>
+                            @((MarkupString)Markdig.Markdown.ToHtml(rec.Source))
+                        </SpaceItem>
+                        <SpaceItem>
+                            Memo:
+                        </SpaceItem>
+                        <SpaceItem>
+                            @((MarkupString)Markdig.Markdown.ToHtml(rec.Memo))
+                        </SpaceItem>
+                    </Space>
+                </Body>
+            </Card>
         }
-    </PropertyColumn>
-    <PropertyColumn Property="c=>c.Reference" Filterable Width="5%">
-        @if (context.HasUrlReference())
-        {
-            <a href="@context.Reference" target="_blank">link</a>
-        }
-        else
-        {
-            @context.Reference
-        }
-    </PropertyColumn>
-    <Column @bind-Field="context.Created" TData="DateTime" Sortable Filterable Width="8%" />
-</Table>
-*@
+    </SpaceItem>
+</Space>
+
 @code {
     [Inject]
     private ILogger<Note> logger { get; set; }
@@ -324,4 +303,3 @@
         }
     }
 }
-
