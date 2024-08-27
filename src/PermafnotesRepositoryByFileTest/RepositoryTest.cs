@@ -160,7 +160,9 @@ namespace PermafnotesRepositoryByFile
                 Assert.That(logger.History, Is.EqualTo(logExpected));
 
                 DirectoryInfo expectedDir = new(Path.Combine(baseDir.ToString(), "Expected"));
-                FileAssert.AreEqual(CreateCacheJsonFileInfo(expectedDir), CreateCacheJsonFileInfo(inputAndActualDir));
+                var actualString = File.ReadAllText(CreateCacheJsonFileInfo(inputAndActualDir).FullName);
+                var expectedString = File.ReadAllText(CreateCacheJsonFileInfo(expectedDir).FullName);
+                Assert.That(actualString, Is.EqualTo(expectedString));
             }
 
             [Test]
@@ -215,7 +217,9 @@ namespace PermafnotesRepositoryByFile
                 Assert.That(logger.History, Is.EqualTo(logExpected));
 
                 DirectoryInfo expectedDir = new(Path.Combine(baseDir.ToString(), "Expected"));
-                FileAssert.AreEqual(CreateCacheJsonFileInfo(expectedDir), CreateCacheJsonFileInfo(inputAndActualDir), "Result's cache.json dont't match the expected");
+                var actualString = File.ReadAllText(CreateCacheJsonFileInfo(inputAndActualDir).FullName);
+                var expectedString = File.ReadAllText(CreateCacheJsonFileInfo(expectedDir).FullName);
+                Assert.That(actualString, Is.EqualTo(expectedString), "Result's cache.json dont't match the expected");
             }
         }
 
@@ -263,7 +267,9 @@ namespace PermafnotesRepositoryByFile
             DirectoryInfo actualDir = new(Path.Combine(inputAndActualDir.ToString(), "notes"));
             DirectoryInfo expectedDir = new(Path.Combine(baseDir.ToString(), "Expected/notes"));
             string expectedNoteFileName = "202208232012552680000.json";
-            FileAssert.AreEqual(CreateNoteFileInfo(expectedDir, expectedNoteFileName), CreateNoteFileInfo(actualDir, expectedNoteFileName));
+            var actualString = File.ReadAllText(CreateNoteFileInfo(actualDir, expectedNoteFileName).FullName);
+            var expectedString = File.ReadAllText(CreateNoteFileInfo(expectedDir, expectedNoteFileName).FullName);
+            Assert.That(actualString, Is.EqualTo(expectedString));
         }
 
     }
