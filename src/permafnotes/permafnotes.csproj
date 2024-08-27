@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="AntDesign" Version="0.20.2.1" />
-    <PackageReference Include="AntDesign.ProLayout" Version="0.13.1" />
+    <PackageReference Include="AntDesign.ProLayout" Version="0.20.2.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.5" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="6.0.5" />
