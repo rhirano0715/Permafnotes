@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 using PermafnotesDomain.Extensions;
 
-public record NoteListModel
+public class NoteListModel
 {
     private static Regex s_regexTagDelimiter = new(@",");
     private static IEnumerable<string> s_csvColumns = new List<string>()
@@ -11,13 +11,15 @@ public record NoteListModel
         "Title", "Source", "Memo", "Tags", "Reference", "Created",
     };
 
+    public long Id { get; set; }
+
     public string Title { get; set; } = string.Empty;
 
     public string Source { get; set; } = string.Empty;
 
     public string Memo { get; set; } = string.Empty;
 
-    public string Tags { get; set; } = string.Empty;
+    public IEnumerable<NoteTagModel> Tags { get; set; } = new List<NoteTagModel>();
 
     public string Reference { get; set; } = string.Empty;
 
@@ -44,10 +46,7 @@ public record NoteListModel
 
     public IEnumerable<NoteTagModel> SplitTags()
     {
-        return s_regexTagDelimiter.Split(Tags)
-            .Select(x => new NoteTagModel(x.Trim()))
-            .Where(x => !string.IsNullOrWhiteSpace(x.Name))
-            ;
+        return Tags;
     }
 
     public NoteFormModel ToNoteFormModel()
@@ -57,7 +56,7 @@ public record NoteListModel
             Title = this.Title,
             Source = this.Source,
             Memo = this.Memo,
-            Tags = s_regexTagDelimiter.Split(this.Tags).Select(x => x.Trim()).ToList(),
+            Tags = Tags.Select(x => x.Name).ToList(),
             Reference = this.Reference,
             Created = this.Created,
         };
@@ -74,7 +73,7 @@ public record NoteListModel
                     this.Title.EscapeDoubleQuote(),
                     this.Source.EscapeDoubleQuote(),
                     this.Memo.EscapeDoubleQuote(),
-                    this.Tags.EscapeDoubleQuote(),
+                    string.Join(",", this.Tags.Select(x => x.Name.EscapeDoubleQuote())),
                     this.Reference.EscapeDoubleQuote(),
                     this.Created.ToString().EscapeDoubleQuote()
                 }
@@ -82,4 +81,22 @@ public record NoteListModel
 
     public bool HasUrlReference()
         => Reference.StartsWith("http://") || Reference.StartsWith("https://");
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is not NoteListModel other)
+            return false;
+
+        return Title == other.Title &&
+               Source == other.Source &&
+               Memo == other.Memo &&
+               Tags.SequenceEqual(other.Tags) &&
+               Reference == other.Reference &&
+               Created == other.Created;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Title, Source, Memo, Tags, Reference, Created);
+    }
 }

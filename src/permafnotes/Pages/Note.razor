@@ -188,7 +188,7 @@
     => NoteRecords.Where(x =>
         x.Title.Contains(key)
         || x.Reference.Contains(key)
-        || x.Tags.Contains(key)
+        || x.Tags.Any(x => x.Name.Contains(key))
         || x.Source.Contains(key)
         || x.Memo.Contains(key)
     );

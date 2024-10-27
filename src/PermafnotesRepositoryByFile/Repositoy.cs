@@ -9,11 +9,13 @@ using CsvHelper;
 using PermafnotesDomain.Models;
 using PermafnotesDomain.Services;
 using AntDesign;
+using System.Text.RegularExpressions;
 
 namespace PermafnotesRepositoryByFile
 {
     public class Repositoy : IPermafnotesRepository
     {
+        private static Regex s_regexTagDelimiter = new(@",");
         private static string s_noteFileDateTimeFormat = "yyyyMMddHHmmssfffffff";
         private static Encoding s_encoding = Encoding.GetEncoding("UTF-8");
 
@@ -66,12 +68,22 @@ namespace PermafnotesRepositoryByFile
 
                 _logger.LogWarning($"{child.Name} is not exists in cache. Loading this.");
                 string text = await this._fileService.ReadNote(child.Name);
-                NoteListModel? model = JsonSerializer.Deserialize<NoteListModel>(text);
+                Note? model = JsonSerializer.Deserialize<Note>(text);
                 if (model is null)
                 {
                     continue;
                 }
-                result.Add(model);
+
+                NoteListModel? noteListModel = new()
+                {
+                    Title = model.Title,
+                    Source = model.Source,
+                    Memo = model.Memo,
+                    Tags = s_regexTagDelimiter.Split(model.Tags).Select(x => new NoteTagModel() { Name = x}).ToList(),
+                    Reference = model.Reference,
+                    Created = model.Created,
+                };
+                result.Add(noteListModel);
             }
 
             await SaveCache(result);
@@ -134,7 +146,17 @@ namespace PermafnotesRepositoryByFile
                 Create(System.Text.Unicode.UnicodeRanges.All)
             };
 
-            string uploadText = JsonSerializer.Serialize<NoteListModel>(noteListModel, options);
+            var note = new Note()
+            {
+                Title = noteListModel.Title,
+                Source = noteListModel.Source,
+                Memo = noteListModel.Memo,
+                Tags = string.Join(",", noteListModel.Tags.Select(x => x.Name)),
+                Reference = noteListModel.Reference,
+                Created = noteListModel.Created,
+            };
+
+            string uploadText = JsonSerializer.Serialize<Note>(note, options);
             string uploadName = $"{noteListModel.Created.ToString(s_noteFileDateTimeFormat)}.json";
 
             await this._fileService.WriteNote(uploadName, uploadText);
@@ -168,9 +190,23 @@ namespace PermafnotesRepositoryByFile
             if (string.IsNullOrEmpty(text))
                 return this.OrderByDescendingNoteRecords();
 
-            List<NoteListModel>? result = JsonSerializer.Deserialize<List<NoteListModel>>(text);
-            if (result is null)
+            List<Note>? loaded = JsonSerializer.Deserialize<List<Note>>(text);
+            if (loaded is null)
                 return this.OrderByDescendingNoteRecords();
+
+            List<NoteListModel> result = new();
+            foreach (var note in loaded)
+            {
+                result.Add(new NoteListModel()
+                {
+                    Title = note.Title,
+                    Source = note.Source,
+                    Memo = note.Memo,
+                    Tags = s_regexTagDelimiter.Split(note.Tags).Select(x => new NoteTagModel() { Name = x }).ToList(),
+                    Reference = note.Reference,
+                    Created = note.Created,
+                });
+            }
 
             return result;
         }
@@ -183,7 +219,17 @@ namespace PermafnotesRepositoryByFile
                 Create(System.Text.Unicode.UnicodeRanges.All)
             };
 
-            string uploadText = JsonSerializer.Serialize<IEnumerable<NoteListModel>>(noteListModels, options);
+            var notes = noteListModels.Select(x => new Note()
+            {
+                Title = x.Title,
+                Source = x.Source,
+                Memo = x.Memo,
+                Tags = string.Join(",", x.Tags.Select(x => x.Name)),
+                Reference = x.Reference,
+                Created = x.Created,
+            });
+
+            string uploadText = JsonSerializer.Serialize<IEnumerable<Note>>(notes, options);
 
             await this._fileService.WriteCache(uploadText);
         }

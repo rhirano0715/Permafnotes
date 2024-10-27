@@ -20,7 +20,12 @@ namespace PermafnotesDomain.Models
                 Title = "Title01",
                 Source = "Source01",
                 Memo = "Memo01",
-                Tags = "Tag01,Tag02,Tag03,Tag04",
+                Tags = new List<NoteTagModel>() {
+                    new NoteTagModel("Tag01"),
+                    new NoteTagModel("Tag02"),
+                    new NoteTagModel("Tag03"),
+                    new NoteTagModel("Tag04"),
+                },
                 Reference = "Reference01",
                 Created = DateTime.MinValue,
             };
@@ -40,7 +45,12 @@ namespace PermafnotesDomain.Models
                     Title = "Title01",
                     Source = "Source01",
                     Memo = "Memo01",
-                    Tags = "Tag01,Tag02,Tag03,Tag04",
+                    Tags = new List<NoteTagModel>() {
+                        new NoteTagModel("Tag01"),
+                        new NoteTagModel("Tag02"),
+                        new NoteTagModel("Tag03"),
+                        new NoteTagModel("Tag04"),
+                    },
                     Reference = "123",
                     Created = DateTime.MinValue,
                 };
@@ -56,7 +66,12 @@ namespace PermafnotesDomain.Models
                     Title = "Title01",
                     Source = "Source01",
                     Memo = "Memo01",
-                    Tags = "Tag01,Tag02,Tag03,Tag04",
+                    Tags = new List<NoteTagModel>() {
+                        new NoteTagModel("Tag01"),
+                        new NoteTagModel("Tag02"),
+                        new NoteTagModel("Tag03"),
+                        new NoteTagModel("Tag04"),
+                    },
                     Reference = "https://aaaa.aaa.com",
                     Created = DateTime.MinValue,
                 };
@@ -72,7 +87,12 @@ namespace PermafnotesDomain.Models
                     Title = "Title01",
                     Source = "Source01",
                     Memo = "Memo01",
-                    Tags = "Tag01,Tag02,Tag03,Tag04",
+                    Tags = new List<NoteTagModel>() {
+                        new NoteTagModel("Tag01"),
+                        new NoteTagModel("Tag02"),
+                        new NoteTagModel("Tag03"),
+                        new NoteTagModel("Tag04"),
+                    },
                     Reference = "http://aaaa.aaa.com",
                     Created = DateTime.MinValue,
                 };
@@ -88,7 +108,12 @@ namespace PermafnotesDomain.Models
                     Title = "Title01",
                     Source = "Source01",
                     Memo = "Memo01",
-                    Tags = "Tag01,Tag02,Tag03,Tag04",
+                    Tags = new List<NoteTagModel>() {
+                        new NoteTagModel("Tag01"),
+                        new NoteTagModel("Tag02"),
+                        new NoteTagModel("Tag03"),
+                        new NoteTagModel("Tag04"),
+                    },
                     Reference = "Reference01",
                     Created = DateTime.MinValue,
                 };
@@ -109,14 +134,18 @@ namespace PermafnotesDomain.Models
             [Test]
             public void WhenTagsHasOneTagThenReturnEnumerableNoteTagModel()
             {
-                NoteListModel model = new NoteListModel() { Tags = "Tag01"};
+                NoteListModel model = new NoteListModel() { 
+                    Tags = new List<NoteTagModel>() { new NoteTagModel("Tag01") } 
+                };
                 IEnumerable<NoteTagModel> expected = new List<NoteTagModel>() { new NoteTagModel("Tag01") };
                 Assert.That(model.SplitTags(), Is.EqualTo(expected));
             }
             [Test]
             public void WhenTagsHasMoreThanOneTagThenReturnEnumerableNoteTagModel()
             {
-                NoteListModel model = new NoteListModel() { Tags = "Tag01, Tag02" };
+                NoteListModel model = new NoteListModel() {
+                    Tags = new List<NoteTagModel>() { new NoteTagModel("Tag01"), new NoteTagModel("Tag02") } 
+                };
                 IEnumerable<NoteTagModel> expected = new List<NoteTagModel>() {
                     new NoteTagModel("Tag01"),
                     new NoteTagModel("Tag02"),
@@ -126,7 +155,10 @@ namespace PermafnotesDomain.Models
             [Test]
             public void IgnoreEmptyElements()
             {
-                NoteListModel model = new NoteListModel() { Tags = "Tag01, , Tag02" };
+                NoteListModel model = new NoteListModel()
+                {
+                    Tags = new List<NoteTagModel>() { new NoteTagModel("Tag01"), new NoteTagModel("Tag02") }
+                };
                 IEnumerable<NoteTagModel> expected = new List<NoteTagModel>() {
                     new NoteTagModel("Tag01"),
                     new NoteTagModel("Tag02"),
@@ -136,7 +168,10 @@ namespace PermafnotesDomain.Models
             [Test]
             public void DeleteSpacesBeforeAndAfterTag()
             {
-                NoteListModel model = new NoteListModel() { Tags = " Tag01, Tag02,Tag03 , Tag04 " };
+                NoteListModel model = new NoteListModel()
+                {
+                    Tags = new List<NoteTagModel>() { new NoteTagModel("Tag01"), new NoteTagModel("Tag02"), new NoteTagModel("Tag03"), new NoteTagModel("Tag04") }
+                };
                 IEnumerable<NoteTagModel> expected = new List<NoteTagModel>() {
                     new NoteTagModel("Tag01"),
                     new NoteTagModel("Tag02"),

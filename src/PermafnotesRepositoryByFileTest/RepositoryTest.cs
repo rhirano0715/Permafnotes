@@ -145,7 +145,7 @@ namespace PermafnotesRepositoryByFile
                         Title = "Title1",
                         Source = "Source1",
                         Memo = "Memo1",
-                        Tags = "Tag1",
+                        Tags = new List<NoteTagModel> () { new NoteTagModel("Tag1") },
                         Reference = "Reference1",
                         Created = DateTime.Parse("2022-08-23T20:12:55.268+09:00")
                     }
@@ -191,7 +191,7 @@ namespace PermafnotesRepositoryByFile
                         Title = "Title1",
                         Source = "Source1",
                         Memo = "Memo1",
-                        Tags = "Tag1",
+                        Tags = new List<NoteTagModel> () { new NoteTagModel("Tag1") },
                         Reference = "Reference1",
                         Created = DateTime.Parse("2022-08-23T20:12:55.268+09:00")
                     },
@@ -199,7 +199,7 @@ namespace PermafnotesRepositoryByFile
                         Title = "Title2",
                         Source = "Source2",
                         Memo = "Memo2",
-                        Tags = "Tag2",
+                        Tags = new List<NoteTagModel> () { new NoteTagModel("Tag2") },
                         Reference = "Reference2",
                         Created = DateTime.Parse("2022-11-23T20:12:55.268+09:00")
                     }
@@ -242,7 +242,7 @@ namespace PermafnotesRepositoryByFile
                 Title = "Title1",
                 Source = "Source1",
                 Memo = "Memo1",
-                Tags = "Tag1" ,
+                Tags = new List<NoteTagModel>() { new NoteTagModel("Tag1")} ,
                 Reference = "Reference1",
                 Created = DateTime.Parse("2022-08-23T20:12:55.268+09:00"),
             };
@@ -257,7 +257,7 @@ namespace PermafnotesRepositoryByFile
                     Title = "Title1",
                     Source = "Source1",
                     Memo = "Memo1",
-                    Tags = "Tag1",
+                    Tags = new List<NoteTagModel>() { new NoteTagModel("Tag1")} ,
                     Reference = "Reference1",
                     Created = DateTime.Parse("2022-08-23T20:12:55.268+09:00")
                 }

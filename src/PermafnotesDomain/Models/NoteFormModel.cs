@@ -28,8 +28,8 @@ public class NoteFormModel
     public override string ToString()
         => $"{Title}, {Source}, {Memo}, {ConvertTagsToString()}, {Reference}";
 
-    internal string ConvertTagsToString()
+    internal IEnumerable<NoteTagModel> ConvertTagsToString()
     {
-        return string.Join(',', Tags.Where(x => !string.IsNullOrEmpty(x)));
+        return Tags.Select(x => new NoteTagModel(x));
     }
 }
