@@ -7,7 +7,7 @@ BEGIN
     UPDATE notes
     SET updated_at = SYSDATETIMEOFFSET()
     FROM inserted i
-    WHERE notes.id = i.id; -- idはテーブルのプライマリキーに合わせて変更してください
+    WHERE notes.id = i.id;
 END;
 
 
