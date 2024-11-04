@@ -16,11 +16,15 @@
     <PackageReference Include="PSC.Blazor.Components.MarkdownEditor" Version="2.0.10" />
     <PackageReference Include="PublishSPAforGitHubPages.Build" Version="2.2.0" />
     <ProjectReference Include="..\PermafnotesDomain\PermafnotesDomain.csproj" />
+    <ProjectReference Include="..\PermafnotesRepositoryByApi\PermafnotesRepositoryByApi.csproj" />
     <ProjectReference Include="..\PermafnotesRepositoryByFile\PermafnotesRepositoryByFile.csproj" />
     <TrimmerRootAssembly Include="Microsoft.Authentication.WebAssembly.Msal" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="wwwroot\appsettings.Development.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="wwwroot\favicon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

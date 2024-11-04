@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using permafnotes;
 using PermafnotesDomain.Services;
 using PermafnotesRepositoryByFile;
+using PermafnotesRepositoryByApi;
 using Microsoft.Graph;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -29,11 +30,27 @@ builder.Logging.SetMinimumLevel(LogLevel.Information);
 builder.Services.AddAntDesign();
 
 builder.Services.AddScoped<NoteService>();
-builder.Services.AddScoped<IPermafnotesRepository, Repositoy>(provider => 
+
+var baseUriString = builder.Configuration["ApiSettings:BaseUri"];
+if (string.IsNullOrEmpty(baseUriString))
 {
-    var client = provider.GetRequiredService<GraphServiceClient>();
-    var logger = provider.GetRequiredService<ILogger<NoteService>>();
-    return Repositoy.CreateRepositoryUsingMsGraph(client, logger);
-});
+    builder.Services.AddScoped<IPermafnotesRepository, PermafnotesRepositoryByFile.Repositoy>(provider =>
+    {
+        var client = provider.GetRequiredService<GraphServiceClient>();
+        var logger = provider.GetRequiredService<ILogger<NoteService>>();
+        return PermafnotesRepositoryByFile.Repositoy.CreateRepositoryUsingMsGraph(client, logger);
+    });
+}
+else
+{
+    builder.Services.AddScoped<IPermafnotesRepository, PermafnotesRepositoryByApi.Repositoy>(provider =>
+    {
+        var baseUri = new Uri(baseUriString);
+        var logger = provider.GetRequiredService<ILogger<NoteService>>();
+        return PermafnotesRepositoryByApi.Repositoy.CreateRepository(baseUri, logger);
+    });
+}
+
+
 
 await builder.Build().RunAsync();

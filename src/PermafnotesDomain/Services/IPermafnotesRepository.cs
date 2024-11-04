@@ -7,6 +7,8 @@ namespace PermafnotesDomain.Services
         Task<IEnumerable<NoteListModel>> Add(NoteListModel input);
         Task Export(IEnumerable<NoteListModel> records, string delimiter = "\t");
         Task<IEnumerable<NoteListModel>> FetchAll(bool onlyCache = false);
+        Task<IEnumerable<NoteListModel>> Update(NoteListModel input);
+
         Task Import(byte[] inputBuffers);
         IAsyncEnumerable<NoteTagModel> SelectAllTags();
     }

@@ -354,3 +354,6 @@ MigrationBackup/
 
 # local
 src/local/
+
+**/*/*.Development.json
+**/*/*.dev.json

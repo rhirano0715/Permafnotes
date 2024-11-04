@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations;
 
 public class NoteFormModel
 {
+    public long Id { get; set; } = 0;
+
     [Required(ErrorMessage = "Title is required")]
     public string Title { get; set; } = string.Empty;
 

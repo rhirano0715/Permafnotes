@@ -49,6 +49,15 @@ namespace PermafnotesRepositoryByFile
             return this.OrderByDescendingNoteRecords();
         }
 
+        public async Task<IEnumerable<NoteListModel>> Update(NoteListModel noteListModel)
+        {
+            this.AddToNoteRecords(noteListModel);
+
+            await PutNoteListModel(noteListModel);
+
+            return this.OrderByDescendingNoteRecords();
+        }
+
         public async Task<IEnumerable<NoteListModel>> FetchAll(bool onlyCache = false)
         {
             this._noteRecords = await LoadCache();

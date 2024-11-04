@@ -23,6 +23,9 @@ namespace PermafnotesDomain.Services
         public async Task<IEnumerable<NoteListModel>> FetchAll(bool onlyCache = false)
             => await this._repository.FetchAll(onlyCache);
 
+        public async Task<IEnumerable<NoteListModel>> Update(NoteFormModel input)
+            => await this._repository.Update(new NoteListModel(input));
+
         public async Task Export(IEnumerable<NoteListModel> records)
             => await this._repository.Export(records);
 

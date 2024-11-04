@@ -125,8 +125,10 @@
 
     private async Task Add()
     {
-        await NoteService.Add(NoteFormModel);
-
+        if (NoteFormModel.Id <= 0)
+            await NoteService.Add(NoteFormModel);
+        else
+            await NoteService.Update(NoteFormModel);
     }
 
     private void OnSelectedItemsChangedHandler(IEnumerable<string> values)
