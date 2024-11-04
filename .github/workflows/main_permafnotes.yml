@@ -28,7 +28,7 @@ jobs:
         run: dotnet publish src/permafnotes/permafnotes.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: create appsettings
-        run: powershell -File .\scripts\create-appsettings.ps1 ${{ secrets.AZUREAD__AUTHORITY }} ${{ secrets.AZUREAD__CLIENTID }} ${{ secrets.AZUREAD__VALIDATEAUTHORITY }} ${{ secrets.APISETTINGS__BASEURI }} "${{env.DOTNET_ROOT}}/myapp/wwwroot/appsettings.json"
+        run: powershell -File .\scripts\create_appsettings.ps1 ${{ secrets.AZUREAD__AUTHORITY }} ${{ secrets.AZUREAD__CLIENTID }} ${{ secrets.AZUREAD__VALIDATEAUTHORITY }} ${{ secrets.APISETTINGS__BASEURI }} "${{env.DOTNET_ROOT}}/myapp/wwwroot/appsettings.json"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
